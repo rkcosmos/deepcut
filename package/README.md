@@ -1,1 +1,1 @@
-# This is where my pip packages be 
+This is where my source for PyPi packages lie 
