@@ -1,5 +1,13 @@
 # Deepcut
-A Thai word tokenization library using Deep Neural Network
+A Thai word tokenization library using Deep Neural Network.
+
+# Performance
+
+The Convolutional Neural network is trained from 90% of NECTEC's BEST corpus(consists of 4 sections, article, news,novel and wikipedia) and test on the rest 10%. The results are as follow
+
+* f1 score:  98.8%
+* precision score:  98.6%
+* recall score:  99.1%
 
 # Installation
 
