@@ -38,6 +38,14 @@ output will be in list format
 ['ตัด','คำ','ได้','ดี','มาก']
 ```
 
+# Notes
+
+Some texts might not be segmented as we would expected (e.g. 'โรงเรียน' -> ['โรง', 'เรียน']), this is because of
+
+* BEST corpus (training data) tokenizes word this way 
+
+* They are unseen/new words -> Ideally, this would be cured by having better corpus but it's not very practical so I am thinking of doing semi supervised learning to incorporate new examples.
+
 # Contributors
 
 * Rakpong Kittinaradorn
