@@ -1,0 +1,8 @@
+# Include the license file
+include LICENSE.txt
+include README.rst
+
+# Include the data files
+# recursive-include deepcut *
+include deepcut/weight/best_cnn3.h5
+include deepcut/weight/object.pk
