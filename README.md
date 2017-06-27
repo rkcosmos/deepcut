@@ -2,6 +2,10 @@
 
 A Thai word tokenization library using Deep Neural Network.
 
+## What's new on version 0.5.1.0
+
+Faster tokenization by code refactorization from our new contributor: Titipat Achakulvisut
+
 ## Performance
 
 The Convolutional Neural network is trained from 90% of NECTEC's BEST corpus(consists of 4 sections, article, news, novel and wikipedia) and test on the rest 10%. It is a binary classification model trying to predict whether a character is the beginning of word or not. The results calculated from only 'true' class are as follow
@@ -55,5 +59,6 @@ Any suggestion and comment are welcome, please post it in issue section.
 
 * Rakpong Kittinaradorn
 * Korakot Chaovavanich
+* Titipat Achakulvisut
 
 And we are open for contribution and collaboration.
