@@ -49,9 +49,9 @@ output will be in list format
 
 Some texts might not be segmented as we would expected (e.g. 'โรงเรียน' -> ['โรง', 'เรียน']), this is because of
 
-* BEST corpus (training data) tokenizes word this way
+* BEST corpus (training data) tokenizes word this way (They use 'Compound words' as a criteria for segmentation)
 
-* They are unseen/new words -> Ideally, this would be cured by having better corpus but it's not very practical so I am thinking of doing semi supervised learning to incorporate new examples.
+* They are unseen/new words -> Ideally, this would be cured by having better corpus but it's not very practical so I am thinking of doing semi-supervised learning to incorporate new examples.
 
 Any suggestion and comment are welcome, please post it in issue section.
 
