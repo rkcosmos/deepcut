@@ -46,7 +46,11 @@ Some texts might not be segmented as we would expected (e.g. 'โรงเรี
 
 * They are unseen/new words -> Ideally, this would be cured by having better corpus but it's not very practical so I am thinking of doing semi supervised learning to incorporate new examples.
 
+Any suggestion and comment are welcome, please post it in issue section.
+
 # Contributors
 
 * Rakpong Kittinaradorn
 * Korakot Chaovavanich
+
+And we are open for contribution and collaboration.
