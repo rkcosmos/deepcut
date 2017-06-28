@@ -16,14 +16,21 @@ The Convolutional Neural network is trained from 90% of NECTEC's BEST corpus(con
 
 ## Installation
 
-On terminal, just type
+Use `pip` to install,
 
 ```bash
 pip install deepcut
-```  
+```
 
-Make sure you are using `tensorflow` backend in `Keras` by making sure ~/.keras/keras.json is as follows (see also https://keras.io/backend/)
-```  
+Or clone the repository and install using `setup.py`
+
+```bash
+python setup.py install
+```
+
+Make sure you are using `tensorflow` backend in `Keras` by making sure `~/.keras/keras.json` is as follows (see also https://keras.io/backend/)
+
+```bash
   {
     "floatx": "float32",
     "epsilon": 1e-07,
@@ -39,7 +46,7 @@ import deepcut
 deepcut.tokenize('ตัดคำได้ดีมาก')
 ```
 
-output will be in list format
+Output will be in list format
 
 ```bash
 ['ตัด','คำ','ได้','ดี','มาก']
