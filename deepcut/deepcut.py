@@ -81,12 +81,10 @@ def create_char_dict(text):
     for char in text:
         if char in CHARS:
             char_dict.append({'char': char,
-                              'type': CHAR_TYPE_FLATTEN.get(char, 'o'),
-                              'target': True})
+                              'type': CHAR_TYPE_FLATTEN.get(char, 'o')})
         else:
             char_dict.append({'char': 'other',
-                              'type': CHAR_TYPE_FLATTEN.get(char, 'o'),
-                              'target': True})
+                              'type': CHAR_TYPE_FLATTEN.get(char, 'o')})
     return char_dict
 
 

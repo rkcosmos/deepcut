@@ -7,7 +7,6 @@ from .deepcut import create_n_gram_df, CHAR_TYPE_FLATTEN, CHARS_MAP, CHAR_TYPES_
 from .model import get_convo_nn2
 
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import precision_score, recall_score, f1_score
 
 
@@ -79,7 +78,7 @@ def generate_best_dataset(best_path, output_path='cleaned_data'):
         test_df = create_char_dataframe(test_words)
         train_df.to_csv(os.path.join(output_path, 'df_best_{}_train.csv'.format(article_type)), index=False)
         test_df.to_csv(os.path.join(output_path, 'df_best_{}_test.csv'.format(article_type)), index=False)
-        print(article_type)
+        print("Save {} to CSV file".format(article_type))
 
 
 def train_model(best_processed_path):
@@ -88,11 +87,13 @@ def train_model(best_processed_path):
     train CNN model for words beginning alongside with
     character label encoder and character type label encoder
 
+    Input
+    =====
+    best_processed_path: str, path to processed BEST dataset
+
     Output
     ======
-    model: keras model
-    char_le: character label encoder
-    type_le: character type label encoder
+    model: keras model, keras model for tokenize prediction
     """
     # padding for training and testing set
     n_pad = 21
