@@ -3,7 +3,7 @@ import re
 from glob import glob
 import pandas as pd
 
-from .deepcut import create_n_gram_df, CHAR_TYPE_FLATTEN
+from .deepcut import create_n_gram_df, CHAR_TYPE_FLATTEN, CHARS_MAP, CHAR_TYPES_MAP
 from .model import get_convo_nn2
 
 from sklearn.model_selection import train_test_split
@@ -12,8 +12,6 @@ from sklearn.metrics import precision_score, recall_score, f1_score
 
 
 article_types = ['article', 'encyclopedia', 'news', 'novel']
-char_labels = ['c', 'n', 'v', 'w', 't', 's',
-               'd', 'q', 'p', 's_e', 'b_e', 'o']
 
 
 def generate_words(files):
@@ -106,19 +104,19 @@ def train_model(best_processed_path):
     df_train, df_test = [], []
     for article_type in article_types:
         df_train.append(pd.read_csv(os.path.join(best_processed_path, 'df_best_{}_train.csv'.format(article_type))))
+        df_test.append(pd.read_csv(os.path.join(best_processed_path, 'df_best_{}_test.csv'.format(article_type))))
     df_train = pd.concat(df_train)
+    df_test = pd.concat(df_test)
     df_train = pd.concat((df_pad, df_train, df_pad)) # pad with empty string feature
+    df_test = pd.concat((df_pad, df_test, df_pad))
 
-    # tranform to
-    char_le = LabelEncoder()
-    char_le.fit(chars)
-    chars = list(df_train.char.unique()) + ['other']
-    char_le.fit(chars)
-    type_le.fit(char_labels)
+    df_train['char'] = df_train['char'].map(lambda x: CHARS_MAP.get(x, 0))
+    df_train['type'] = df_train['type'].map(lambda x: CHAR_TYPES_MAP.get(x, 0))
+    df_test['char'] = df_test['char'].map(lambda x: CHARS_MAP.get(x, 0))
+    df_test['type'] = df_test['type'].map(lambda x: CHAR_TYPES_MAP.get(x, 0))
 
-    df_train['char'] = char_le.transform(df_train['char'].astype(str))
-    df_train['type'] = type_le.transform(df_train['type'].astype(str))
     df_train_pad = create_n_gram_df(df_train, n_pad=n_pad)
+    df_test_pad = create_n_gram_df(df_test, n_pad=n_pad)
 
     char_row = ['char' + str(i + 1) for i in range(n_pad_2)] + \
                ['char-' + str(i + 1) for i in range(n_pad_2)] + ['char']
@@ -136,4 +134,4 @@ def train_model(best_processed_path):
     model.fit([x_train1, x_train2], y_train, epochs=3, batch_size=4096, verbose=2)
     model.fit([x_train1, x_train2], y_train, epochs=3, batch_size=8192, verbose=2)
 
-    return model, char_le, type_le
+    return model

@@ -4,11 +4,8 @@ import pandas as pd
 from .model import get_convo_nn2
 
 module_path = os.path.dirname(__file__)
-object_path = os.path.join(module_path, 'weight', 'object.pk')
 weight_path = os.path.join(module_path, 'weight', 'best_cnn3.h5')
 
-with open(object_path, 'rb') as handle:
-    char_le, type_le, listed_char = pickle.load(handle)
 
 CHAR_TYPE = {
     'กขฃคฆงจชซญฎฏฐฑฒณดตถทธนบปพฟภมยรลวศษสฬอ': 'c',
@@ -31,6 +28,32 @@ CHAR_TYPE_FLATTEN = {}
 for ks, v in CHAR_TYPE.items():
     for k in ks:
         CHAR_TYPE_FLATTEN[k] = v
+
+# create map of dictionary to character
+CHARS = [
+    '\n', ' ', '!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+',
+    ',', '-', '.', '/', '0', '1', '2', '3', '4', '5', '6', '7', '8',
+    '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C', 'D', 'E',
+    'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
+    'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_',
+    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+    'n', 'o', 'other', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y',
+    'z', '}', '~', 'ก', 'ข', 'ฃ', 'ค', 'ฅ', 'ฆ', 'ง', 'จ', 'ฉ', 'ช',
+    'ซ', 'ฌ', 'ญ', 'ฎ', 'ฏ', 'ฐ', 'ฑ', 'ฒ', 'ณ', 'ด', 'ต', 'ถ', 'ท',
+    'ธ', 'น', 'บ', 'ป', 'ผ', 'ฝ', 'พ', 'ฟ', 'ภ', 'ม', 'ย', 'ร', 'ฤ',
+    'ล', 'ว', 'ศ', 'ษ', 'ส', 'ห', 'ฬ', 'อ', 'ฮ', 'ฯ', 'ะ', 'ั', 'า',
+    'ำ', 'ิ', 'ี', 'ึ', 'ื', 'ุ', 'ู', 'ฺ', 'เ', 'แ', 'โ', 'ใ', 'ไ',
+    'ๅ', 'ๆ', '็', '่', '้', '๊', '๋', '์', 'ํ', '๐', '๑', '๒', '๓',
+    '๔', '๕', '๖', '๗', '๘', '๙', '‘', '’', '\ufeff'
+]
+CHARS_MAP = {v: k for k, v in enumerate(CHARS)}
+
+CHAR_TYPES = [
+    'b_e', 'c', 'd', 'n', 'o',
+    'p', 'q', 's', 's_e', 't',
+    'v', 'w'
+]
+CHAR_TYPES_MAP = {v: k for k, v in enumerate(CHAR_TYPES)}
 
 # load model when importing library
 model = get_convo_nn2()
@@ -56,7 +79,7 @@ def create_char_dict(text):
     """
     char_dict = []
     for char in text:
-        if char in listed_char:
+        if char in CHARS:
             char_dict.append({'char': char,
                               'type': CHAR_TYPE_FLATTEN.get(char, 'o'),
                               'target': True})
@@ -96,8 +119,8 @@ def tokenize(text):
     char_dict = create_char_dict(text)
     char_dict_pad = pad_dict(char_dict, n_pad=n_pad)
     char_df = pd.DataFrame(char_dict_pad)
-    char_df['char'] = char_le.transform(char_df['char'])
-    char_df['type'] = type_le.transform(char_df['type'])
+    char_df['char'] = char_df['char'].map(lambda x: CHARS_MAP.get(x, 0))
+    char_df['type'] = char_df['type'].map(lambda x: CHAR_TYPES_MAP.get(x, 0))
     char_df_ngram = create_n_gram_df(char_df, n_pad=n_pad)
 
     char_row = ['char' + str(i + 1) for i in range(n_pad_2)] + \
