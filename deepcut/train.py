@@ -103,8 +103,8 @@ def prepare_feature(best_processed_path, option='train'):
     df = pd.concat(df)
     df = pd.concat((df_pad, df, df_pad)) # pad with empty string feature
 
-    df['char'] = df['char'].map(lambda x: CHARS_MAP.get(x, 0))
-    df['type'] = df['type'].map(lambda x: CHAR_TYPES_MAP.get(x, 0))
+    df['char'] = df['char'].map(lambda x: CHARS_MAP.get(x, 80))
+    df['type'] = df['type'].map(lambda x: CHAR_TYPES_MAP.get(x, 4))
     df_pad = create_n_gram_df(df, n_pad=n_pad)
 
     char_row = ['char' + str(i + 1) for i in range(n_pad_2)] + \
