@@ -117,8 +117,8 @@ def tokenize(text):
     char_dict = create_char_dict(text)
     char_dict_pad = pad_dict(char_dict, n_pad=n_pad)
     char_df = pd.DataFrame(char_dict_pad)
-    char_df['char'] = char_df['char'].map(lambda x: CHARS_MAP.get(x, 0))
-    char_df['type'] = char_df['type'].map(lambda x: CHAR_TYPES_MAP.get(x, 0))
+    char_df['char'] = char_df['char'].map(lambda x: CHARS_MAP.get(x, 80))
+    char_df['type'] = char_df['type'].map(lambda x: CHAR_TYPES_MAP.get(x, 4))
     char_df_ngram = create_n_gram_df(char_df, n_pad=n_pad)
 
     char_row = ['char' + str(i + 1) for i in range(n_pad_2)] + \
