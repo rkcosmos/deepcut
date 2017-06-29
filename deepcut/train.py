@@ -1,13 +1,11 @@
 import os
-import re
 from glob import glob
 import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import precision_score, recall_score, f1_score
 
 from .deepcut import create_n_gram_df, CHAR_TYPE_FLATTEN, CHARS_MAP, CHAR_TYPES_MAP
 from .model import get_convo_nn2
-
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import precision_score, recall_score, f1_score
 
 
 article_types = ['article', 'encyclopedia', 'news', 'novel']
