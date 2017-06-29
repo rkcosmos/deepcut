@@ -81,6 +81,44 @@ def generate_best_dataset(best_path, output_path='cleaned_data'):
         print("Save {} to CSV file".format(article_type))
 
 
+def prepare_feature(best_processed_path, option='train'):
+    """
+    Transform processed path into
+
+    Input
+    =====
+    best_processed_path: str, path to processed BEST dataset
+
+    option: str, 'train' or 'test'
+    """
+    # padding for training and testing set
+    n_pad = 21
+    n_pad_2 = int((n_pad - 1)/2)
+    pad = [{'char': ' ', 'type': 'p', 'target': True}]
+    df_pad = pd.DataFrame(pad * n_pad_2)
+
+    df = []
+    for article_type in article_types:
+        df.append(pd.read_csv(os.path.join(best_processed_path, 'df_best_{}_{}.csv'.format(article_type, option))))
+    df = pd.concat(df)
+    df = pd.concat((df_pad, df, df_pad)) # pad with empty string feature
+
+    df['char'] = df['char'].map(lambda x: CHARS_MAP.get(x, 0))
+    df['type'] = df['type'].map(lambda x: CHAR_TYPES_MAP.get(x, 0))
+    df_pad = create_n_gram_df(df, n_pad=n_pad)
+
+    char_row = ['char' + str(i + 1) for i in range(n_pad_2)] + \
+               ['char-' + str(i + 1) for i in range(n_pad_2)] + ['char']
+    type_row = ['type' + str(i + 1) for i in range(n_pad_2)] + \
+               ['type-' + str(i + 1) for i in range(n_pad_2)] + ['type']
+
+    x_char = df_pad[char_row].as_matrix()
+    x_type = df_pad[type_row].as_matrix()
+    y = df_pad['target'].astype(int)
+
+    return x_char, x_type, y
+
+
 def train_model(best_processed_path):
     """
     Given path to processed BEST dataset,
@@ -95,44 +133,31 @@ def train_model(best_processed_path):
     ======
     model: keras model, keras model for tokenize prediction
     """
-    # padding for training and testing set
-    n_pad = 21
-    n_pad_2 = int((n_pad - 1)/2)
-    pad = [{'char': ' ', 'type': 'p', 'target': True}]
-    df_pad = pd.DataFrame(pad * n_pad_2)
 
-    # read and concat all characters
-    df_train, df_test = [], []
-    for article_type in article_types:
-        df_train.append(pd.read_csv(os.path.join(best_processed_path, 'df_best_{}_train.csv'.format(article_type))))
-        df_test.append(pd.read_csv(os.path.join(best_processed_path, 'df_best_{}_test.csv'.format(article_type))))
-    df_train = pd.concat(df_train)
-    df_test = pd.concat(df_test)
-    df_train = pd.concat((df_pad, df_train, df_pad)) # pad with empty string feature
-    df_test = pd.concat((df_pad, df_test, df_pad))
+    x_train_char, x_train_type, y_train = prepare_feature(best_processed_path, option='train')
 
-    df_train['char'] = df_train['char'].map(lambda x: CHARS_MAP.get(x, 0))
-    df_train['type'] = df_train['type'].map(lambda x: CHAR_TYPES_MAP.get(x, 0))
-    df_test['char'] = df_test['char'].map(lambda x: CHARS_MAP.get(x, 0))
-    df_test['type'] = df_test['type'].map(lambda x: CHAR_TYPES_MAP.get(x, 0))
-
-    df_train_pad = create_n_gram_df(df_train, n_pad=n_pad)
-    df_test_pad = create_n_gram_df(df_test, n_pad=n_pad)
-
-    char_row = ['char' + str(i + 1) for i in range(n_pad_2)] + \
-               ['char-' + str(i + 1) for i in range(n_pad_2)] + ['char']
-    type_row = ['type' + str(i + 1) for i in range(n_pad_2)] + \
-               ['type-' + str(i + 1) for i in range(n_pad_2)] + ['type']
-
-    x_train1 = df_train_pad[char_row].as_matrix()
-    x_train2 = df_train_pad[type_row].as_matrix()
-    y_train = df_train_pad['target']
-
+    # train model
     model = get_convo_nn2()
-    model.fit([x_train1, x_train2], y_train, epochs=10, batch_size=256, verbose=2)
-    model.fit([x_train1, x_train2], y_train, epochs=3, batch_size=512, verbose=2)
-    model.fit([x_train1, x_train2], y_train, epochs=3, batch_size=2048, verbose=2)
-    model.fit([x_train1, x_train2], y_train, epochs=3, batch_size=4096, verbose=2)
-    model.fit([x_train1, x_train2], y_train, epochs=3, batch_size=8192, verbose=2)
+    model.fit([x_train_char, x_train_type], y_train, epochs=10, batch_size=256, verbose=2)
+    model.fit([x_train_char, x_train_type], y_train, epochs=3, batch_size=512, verbose=2)
+    model.fit([x_train_char, x_train_type], y_train, epochs=3, batch_size=2048, verbose=2)
+    model.fit([x_train_char, x_train_type], y_train, epochs=3, batch_size=4096, verbose=2)
+    model.fit([x_train_char, x_train_type], y_train, epochs=3, batch_size=8192, verbose=2)
 
     return model
+
+
+def evaluate(best_processed_path, model):
+    """
+    Evaluate model with splitted testing set
+    """
+    x_test_char, x_test_type, y_test = prepare_feature(best_processed_path, option='test')
+
+    y_predict = model.predict([x_test_char, x_test_type])
+    y_predict = (y_predict.ravel() > 0.5).astype(int)
+
+    f1score = f1_score(y_test, y_predict)
+    precision = precision_score(y_test, y_predict)
+    recall = recall_score(y_test, y_predict)
+
+    return f1score, precision, recall
