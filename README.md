@@ -16,10 +16,16 @@ The Convolutional Neural network is trained from 90% of NECTEC's BEST corpus(con
 
 ## Installation
 
-Use `pip` to install,
+Install using `pip` for stable release,
 
 ```bash
 pip install deepcut
+```
+
+For latest development release,
+
+```bash
+pip install git+git://github.com/rkcosmos/deepcut.git
 ```
 
 Or clone the repository and install using `setup.py`
