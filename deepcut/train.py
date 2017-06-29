@@ -1,13 +1,11 @@
 import os
-import re
 from glob import glob
 import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import precision_score, recall_score, f1_score
 
 from .deepcut import create_n_gram_df, CHAR_TYPE_FLATTEN, CHARS_MAP, CHAR_TYPES_MAP
 from .model import get_convo_nn2
-
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import precision_score, recall_score, f1_score
 
 
 article_types = ['article', 'encyclopedia', 'news', 'novel']
@@ -103,8 +101,8 @@ def prepare_feature(best_processed_path, option='train'):
     df = pd.concat(df)
     df = pd.concat((df_pad, df, df_pad)) # pad with empty string feature
 
-    df['char'] = df['char'].map(lambda x: CHARS_MAP.get(x, 0))
-    df['type'] = df['type'].map(lambda x: CHAR_TYPES_MAP.get(x, 0))
+    df['char'] = df['char'].map(lambda x: CHARS_MAP.get(x, 80))
+    df['type'] = df['type'].map(lambda x: CHAR_TYPES_MAP.get(x, 4))
     df_pad = create_n_gram_df(df, n_pad=n_pad)
 
     char_row = ['char' + str(i + 1) for i in range(n_pad_2)] + \

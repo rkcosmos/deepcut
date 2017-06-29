@@ -1,8 +1,7 @@
 from keras.models import Model
 from keras.layers import Input, Dense, Embedding, \
-    Concatenate, Flatten, Dropout, \
-    SpatialDropout1D, BatchNormalization, \
-    Conv1D, MaxPooling1D, Maximum, ZeroPadding1D
+    Concatenate, Flatten, SpatialDropout1D, \
+    BatchNormalization, Conv1D, Maximum, ZeroPadding1D
 from keras.layers import TimeDistributed
 from keras.optimizers import Adam
 

@@ -1,5 +1,7 @@
 # Deepcut
 
+[![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/rkcosmos/deepcut/blob/master/LICENSE)
+
 A Thai word tokenization library using Deep Neural Network.
 
 ## What's new on version 0.5.1.0

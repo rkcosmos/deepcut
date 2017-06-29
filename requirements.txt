@@ -1,3 +1,5 @@
-keras>=2.0.0
-tensorflow
+numpy
 pandas
+scikit-learn
+tensorflow
+keras>=2.0.0

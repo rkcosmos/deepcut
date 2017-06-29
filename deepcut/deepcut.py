@@ -1,5 +1,4 @@
 import os
-import pickle
 import pandas as pd
 from .model import get_convo_nn2
 
