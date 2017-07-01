@@ -1,27 +1,34 @@
 import os
 from glob import glob
 import pandas as pd
+from functools import reduce
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_score, recall_score, f1_score
 
-from .deepcut import create_n_gram_df, CHAR_TYPE_FLATTEN, CHARS_MAP, CHAR_TYPES_MAP
-from .model import get_convo_nn2
-
+if __package__ != 'deepcut':
+    from utils import create_n_gram_df, CHAR_TYPE_FLATTEN, CHARS_MAP, CHAR_TYPES_MAP
+    from model import get_convo_nn2
+else:
+    from .utils import create_n_gram_df, CHAR_TYPE_FLATTEN, CHARS_MAP, CHAR_TYPES_MAP
+    from .model import get_convo_nn2
 
 article_types = ['article', 'encyclopedia', 'news', 'novel']
-
 
 def generate_words(files):
     """
     Transform list of files to list of words,
     removing new line character
-    and replace name entity '<NE>...</NE>' symbol
+    and replace name entity '<NE>...</NE>' and abbreviation '<AB>...</AB>' symbol
     """
+    
+    repls = {'<NE>' : '','</NE>' : '','<AB>': '','</AB>': ''}
+    
     words_all = []
     for i, file in enumerate(files):
         lines = open(file, 'r')
         for line in lines:
-            words = [word.replace('<NE>', '').replace('</NE>', '') for word in line.split("|") if word is not '\n']
+            line = reduce(lambda a, kv: a.replace(*kv), repls.items(), line)
+            words = [word for word in line.split("|") if word is not '\n']
             words_all.extend(words)
     return words_all
 
@@ -69,7 +76,7 @@ def generate_best_dataset(best_path, output_path='cleaned_data'):
 
     for article_type in article_types:
         files = glob(os.path.join(best_path, article_type, '*.txt'))
-        files_train, files_test = train_test_split(files, random_state=0)
+        files_train, files_test = train_test_split(files, random_state=0, test_size=0.1)
         train_words = generate_words(files_train)
         test_words = generate_words(files_test)
         train_df = create_char_dataframe(train_words)
@@ -133,14 +140,20 @@ def train_model(best_processed_path):
     """
 
     x_train_char, x_train_type, y_train = prepare_feature(best_processed_path, option='train')
+    x_test_char, x_test_type, y_test = prepare_feature(best_processed_path, option='test')
 
     # train model
     model = get_convo_nn2()
-    model.fit([x_train_char, x_train_type], y_train, epochs=10, batch_size=256, verbose=2)
-    model.fit([x_train_char, x_train_type], y_train, epochs=3, batch_size=512, verbose=2)
-    model.fit([x_train_char, x_train_type], y_train, epochs=3, batch_size=2048, verbose=2)
-    model.fit([x_train_char, x_train_type], y_train, epochs=3, batch_size=4096, verbose=2)
-    model.fit([x_train_char, x_train_type], y_train, epochs=3, batch_size=8192, verbose=2)
+    model.fit([x_train_char, x_train_type], y_train, epochs=10, batch_size=256, verbose=2,\
+              validation_data = ([x_test_char, x_test_type], y_test))
+    model.fit([x_train_char, x_train_type], y_train, epochs=3, batch_size=512, verbose=2,\
+              validation_data = ([x_test_char, x_test_type], y_test))
+    model.fit([x_train_char, x_train_type], y_train, epochs=3, batch_size=2048, verbose=2,\
+              validation_data = ([x_test_char, x_test_type], y_test))
+    model.fit([x_train_char, x_train_type], y_train, epochs=3, batch_size=4096, verbose=2,\
+              validation_data = ([x_test_char, x_test_type], y_test))
+    model.fit([x_train_char, x_train_type], y_train, epochs=3, batch_size=8192, verbose=2,\
+              validation_data = ([x_test_char, x_test_type], y_test))
 
     return model
 
@@ -159,3 +172,4 @@ def evaluate(best_processed_path, model):
     recall = recall_score(y_test, y_predict)
 
     return f1score, precision, recall
+
