@@ -10,7 +10,7 @@ setup(
     packages=['deepcut'],
     include_package_data=True,
     version='0.5.1.0',
-    install_requires=['tensorflow', 'keras>=2.0.0', 'pandas',
+    install_requires=['keras>=2.0.0', 'pandas',
                       'scipy', 'numpy', 'scikit-learn', 'h5py'],
     license='MIT',
     description='A Thai word tokenization library using Deep Neural Network',
