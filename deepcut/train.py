@@ -60,7 +60,7 @@ def create_char_dataframe(words):
     return pd.DataFrame(char_dict)
 
 
-def generate_best_dataset(best_path, output_path='cleaned_data'):
+def generate_best_dataset(best_path, output_path='cleaned_data', create_dev=False):
     """
     Generate CSV file for training and testing data
 
@@ -72,6 +72,9 @@ def generate_best_dataset(best_path, output_path='cleaned_data'):
     cleaned_data: str, path to output folder, the cleaned data will be saved
         in the given folder name where training set will be stored in `train` folder
         and testing set will be stored on `test` folder
+
+    create_dev: boolean, True or False, if True, divide training set into training set and
+    development set in `dev` folder
     """
     if not os.path.isdir(output_path):
         os.mkdir(output_path)
@@ -79,10 +82,17 @@ def generate_best_dataset(best_path, output_path='cleaned_data'):
         os.makedirs(os.path.join(output_path, 'train'))
     if not os.path.isdir(os.path.join(output_path, 'test')):
         os.makedirs(os.path.join(output_path, 'test'))
+    if not os.path.isdir(os.path.join(output_path, 'dev')) and create_dev:
+        os.makedirs(os.path.join(output_path, 'dev'))
 
     for article_type in article_types:
         files = glob(os.path.join(best_path, article_type, '*.txt'))
         files_train, files_test = train_test_split(files, random_state=0, test_size=0.1)
+        if create_dev:
+            files_train, files_dev = train_test_split(files_train, random_state=0, test_size=0.1)
+            dev_words = generate_words(files_dev)
+            dev_df = create_char_dataframe(dev_words)
+            dev_df.to_csv(os.path.join(output_path, 'dev', 'df_best_{}_dev.csv'.format(article_type)), random_state=0, index=False)
         train_words = generate_words(files_train)
         test_words = generate_words(files_test)
         train_df = create_char_dataframe(train_words)
@@ -130,7 +140,7 @@ def prepare_feature(best_processed_path, option='train'):
     return x_char, x_type, y
 
 
-def train_model(best_processed_path, weight_path='../weight/save_weight.h5'):
+def train_model(best_processed_path, weight_path='../weight/model_weight.h5', verbose=2):
     """
     Given path to processed BEST dataset,
     train CNN model for words beginning alongside with
@@ -139,6 +149,8 @@ def train_model(best_processed_path, weight_path='../weight/save_weight.h5'):
     Input
     =====
     best_processed_path: str, path to processed BEST dataset
+    weight_path: str, path to weight path file
+    verbose: int, verbost option for training Keras model
 
     Output
     ======
@@ -147,9 +159,9 @@ def train_model(best_processed_path, weight_path='../weight/save_weight.h5'):
 
     x_train_char, x_train_type, y_train = prepare_feature(best_processed_path, option='train')
     x_test_char, x_test_type, y_test = prepare_feature(best_processed_path, option='test')
-
-    # divide training set into train/dev set
-    x_train_char, x_dev_char, x_train_type, x_dev_type, y_train, y_dev = train_test_split(x_train_char, x_train_type, y_train, test_size=0.1)
+    if os.path.isdir(os.path.join(best_processed_path, 'dev')):
+        dev = True
+        x_dev_char, x_dev_type, y_dev = prepare_feature(best_processed_path, option='dev')
 
     callbacks_list = [
         ReduceLROnPlateau(),
@@ -165,21 +177,16 @@ def train_model(best_processed_path, weight_path='../weight/save_weight.h5'):
 
     # train model
     model = get_convo_nn2()
-    model.fit([x_train_char, x_train_type], y_train, epochs=10, batch_size=256, verbose=2,
-              callbacks=callbacks_list,
-              validation_data=([x_dev_char, x_dev_type], y_dev))
-    model.fit([x_train_char, x_train_type], y_train, epochs=3, batch_size=512, verbose=2,
-              callbacks=callbacks_list,
-              validation_data=([x_dev_char, x_dev_type], y_dev))
-    model.fit([x_train_char, x_train_type], y_train, epochs=3, batch_size=2048, verbose=2,
-              callbacks=callbacks_list,
-              validation_data=([x_dev_char, x_dev_type], y_dev))
-    model.fit([x_train_char, x_train_type], y_train, epochs=3, batch_size=4096, verbose=2,
-              callbacks=callbacks_list,
-              validation_data=([x_dev_char, x_dev_type], y_dev))
-    model.fit([x_train_char, x_train_type], y_train, epochs=10, batch_size=8192, verbose=2,
-              callbacks=callbacks_list,
-              validation_data=([x_dev_char, x_dev_type], y_dev))
+    train_params = [(10, 256), (3, 512), (3, 2048), (3, 4096), (3, 8192)]
+    for (epochs, batch_size) in train_params:
+        print("train with {} epochs and {} batch size".format(epochs, batch_size))
+        if dev:
+            model.fit([x_train_char, x_train_type], y_train, epochs=epochs, batch_size=batch_size, verbose=verbose,
+                      callbacks=callbacks_list,
+                      validation_data=([x_dev_char, x_dev_type], y_dev))
+        else:
+            model.fit([x_train_char, x_train_type], y_train, epochs=epochs, batch_size=batch_size, verbose=verbose,
+                      callbacks=callbacks_list)
     return model
 
 
