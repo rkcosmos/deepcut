@@ -4,6 +4,7 @@ import pandas as pd
 from functools import reduce
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_score, recall_score, f1_score
+from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 
 if __package__ != 'deepcut':
     from utils import create_n_gram_df, CHAR_TYPE_FLATTEN, CHARS_MAP, CHAR_TYPES_MAP
@@ -20,9 +21,9 @@ def generate_words(files):
     removing new line character
     and replace name entity '<NE>...</NE>' and abbreviation '<AB>...</AB>' symbol
     """
-    
+
     repls = {'<NE>' : '','</NE>' : '','<AB>': '','</AB>': ''}
-    
+
     words_all = []
     for i, file in enumerate(files):
         lines = open(file, 'r')
@@ -69,10 +70,15 @@ def generate_best_dataset(best_path, output_path='cleaned_data'):
         'article', 'encyclopedia', 'news', 'novel'
 
     cleaned_data: str, path to output folder, the cleaned data will be saved
-        in the given folder name
+        in the given folder name where training set will be stored in `train` folder
+        and testing set will be stored on `test` folder
     """
     if not os.path.isdir(output_path):
         os.mkdir(output_path)
+    if not os.path.isdir(os.path.join(output_path, 'train')):
+        os.makedirs(os.path.join(output_path, 'train'))
+    if not os.path.isdir(os.path.join(output_path, 'test')):
+        os.makedirs(os.path.join(output_path, 'test'))
 
     for article_type in article_types:
         files = glob(os.path.join(best_path, article_type, '*.txt'))
@@ -81,14 +87,14 @@ def generate_best_dataset(best_path, output_path='cleaned_data'):
         test_words = generate_words(files_test)
         train_df = create_char_dataframe(train_words)
         test_df = create_char_dataframe(test_words)
-        train_df.to_csv(os.path.join(output_path, 'df_best_{}_train.csv'.format(article_type)), index=False)
-        test_df.to_csv(os.path.join(output_path, 'df_best_{}_test.csv'.format(article_type)), index=False)
+        train_df.to_csv(os.path.join(output_path, 'train', 'df_best_{}_train.csv'.format(article_type)), index=False)
+        test_df.to_csv(os.path.join(output_path, 'test', 'df_best_{}_test.csv'.format(article_type)), index=False)
         print("Save {} to CSV file".format(article_type))
 
 
 def prepare_feature(best_processed_path, option='train'):
     """
-    Transform processed path into
+    Transform processed path into feature matrix and output array
 
     Input
     =====
@@ -104,7 +110,7 @@ def prepare_feature(best_processed_path, option='train'):
 
     df = []
     for article_type in article_types:
-        df.append(pd.read_csv(os.path.join(best_processed_path, 'df_best_{}_{}.csv'.format(article_type, option))))
+        df.append(pd.read_csv(os.path.join(best_processed_path, option, 'df_best_{}_{}.csv'.format(article_type, option))))
     df = pd.concat(df)
     df = pd.concat((df_pad, df, df_pad)) # pad with empty string feature
 
@@ -119,12 +125,12 @@ def prepare_feature(best_processed_path, option='train'):
 
     x_char = df_pad[char_row].as_matrix()
     x_type = df_pad[type_row].as_matrix()
-    y = df_pad['target'].astype(int)
+    y = df_pad['target'].astype(int).as_matrix()
 
     return x_char, x_type, y
 
 
-def train_model(best_processed_path):
+def train_model(best_processed_path, weight_path='../weight/save_weight.h5'):
     """
     Given path to processed BEST dataset,
     train CNN model for words beginning alongside with
@@ -142,19 +148,38 @@ def train_model(best_processed_path):
     x_train_char, x_train_type, y_train = prepare_feature(best_processed_path, option='train')
     x_test_char, x_test_type, y_test = prepare_feature(best_processed_path, option='test')
 
+    # divide training set into train/dev set
+    x_train_char, x_dev_char, x_train_type, x_dev_type, y_train, y_dev = train_test_split(x_train_char, x_train_type, y_train, test_size=0.1)
+
+    callbacks_list = [
+        ReduceLROnPlateau(),
+        ModelCheckpoint(
+            weight_path,
+            save_best_only=True,
+            save_weights_only=True,
+            monitor='val_loss',
+            mode='min',
+            verbose=1
+        )
+    ]
+
     # train model
     model = get_convo_nn2()
-    model.fit([x_train_char, x_train_type], y_train, epochs=10, batch_size=256, verbose=2,\
-              validation_data = ([x_test_char, x_test_type], y_test))
-    model.fit([x_train_char, x_train_type], y_train, epochs=3, batch_size=512, verbose=2,\
-              validation_data = ([x_test_char, x_test_type], y_test))
-    model.fit([x_train_char, x_train_type], y_train, epochs=3, batch_size=2048, verbose=2,\
-              validation_data = ([x_test_char, x_test_type], y_test))
-    model.fit([x_train_char, x_train_type], y_train, epochs=3, batch_size=4096, verbose=2,\
-              validation_data = ([x_test_char, x_test_type], y_test))
-    model.fit([x_train_char, x_train_type], y_train, epochs=3, batch_size=8192, verbose=2,\
-              validation_data = ([x_test_char, x_test_type], y_test))
-
+    model.fit([x_train_char, x_train_type], y_train, epochs=10, batch_size=256, verbose=2,
+              callbacks=callbacks_list,
+              validation_data=([x_dev_char, x_dev_type], y_dev))
+    model.fit([x_train_char, x_train_type], y_train, epochs=3, batch_size=512, verbose=2,
+              callbacks=callbacks_list,
+              validation_data=([x_dev_char, x_dev_type], y_dev))
+    model.fit([x_train_char, x_train_type], y_train, epochs=3, batch_size=2048, verbose=2,
+              callbacks=callbacks_list,
+              validation_data=([x_dev_char, x_dev_type], y_dev))
+    model.fit([x_train_char, x_train_type], y_train, epochs=3, batch_size=4096, verbose=2,
+              callbacks=callbacks_list,
+              validation_data=([x_dev_char, x_dev_type], y_dev))
+    model.fit([x_train_char, x_train_type], y_train, epochs=10, batch_size=8192, verbose=2,
+              callbacks=callbacks_list,
+              validation_data=([x_dev_char, x_dev_type], y_dev))
     return model
 
 
@@ -172,4 +197,3 @@ def evaluate(best_processed_path, model):
     recall = recall_score(y_test, y_predict)
 
     return f1score, precision, recall
-
