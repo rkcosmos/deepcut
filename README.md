@@ -47,6 +47,8 @@ Make sure you are using `tensorflow` backend in `Keras` by making sure `~/.keras
   }
 ```
 
+We do not add `tensorflow` in automatic installation process because it has cpu and gpu version. Installing cpu version to everyone might break those who already have gpu version installed. So please install tensorflow yourself following this guildline https://www.tensorflow.org/install/. 
+
 ## Usage
 
 ```python
