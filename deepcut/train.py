@@ -60,7 +60,7 @@ def create_char_dataframe(words):
     return pd.DataFrame(char_dict)
 
 
-def generate_best_dataset(best_path, output_path='cleaned_data', create_dev=False):
+def generate_best_dataset(best_path, output_path='cleaned_data', create_val=False):
     """
     Generate CSV file for training and testing data
 
@@ -73,8 +73,8 @@ def generate_best_dataset(best_path, output_path='cleaned_data', create_dev=Fals
         in the given folder name where training set will be stored in `train` folder
         and testing set will be stored on `test` folder
 
-    create_dev: boolean, True or False, if True, divide training set into training set and
-    development set in `dev` folder
+    create_val: boolean, True or False, if True, divide training set into training set and
+        validation set in `val` folder
     """
     if not os.path.isdir(output_path):
         os.mkdir(output_path)
@@ -82,17 +82,17 @@ def generate_best_dataset(best_path, output_path='cleaned_data', create_dev=Fals
         os.makedirs(os.path.join(output_path, 'train'))
     if not os.path.isdir(os.path.join(output_path, 'test')):
         os.makedirs(os.path.join(output_path, 'test'))
-    if not os.path.isdir(os.path.join(output_path, 'dev')) and create_dev:
-        os.makedirs(os.path.join(output_path, 'dev'))
+    if not os.path.isdir(os.path.join(output_path, 'val')) and create_val:
+        os.makedirs(os.path.join(output_path, 'val'))
 
     for article_type in article_types:
         files = glob(os.path.join(best_path, article_type, '*.txt'))
         files_train, files_test = train_test_split(files, random_state=0, test_size=0.1)
-        if create_dev:
-            files_train, files_dev = train_test_split(files_train, random_state=0, test_size=0.1)
-            dev_words = generate_words(files_dev)
-            dev_df = create_char_dataframe(dev_words)
-            dev_df.to_csv(os.path.join(output_path, 'dev', 'df_best_{}_dev.csv'.format(article_type)), random_state=0, index=False)
+        if create_val:
+            files_train, files_val = train_test_split(files_train, random_state=0, test_size=0.1)
+            val_words = generate_words(files_val)
+            val_df = create_char_dataframe(val_words)
+            val_df.to_csv(os.path.join(output_path, 'val', 'df_best_{}_val.csv'.format(article_type)), random_state=0, index=False)
         train_words = generate_words(files_train)
         test_words = generate_words(files_test)
         train_df = create_char_dataframe(train_words)
@@ -159,9 +159,9 @@ def train_model(best_processed_path, weight_path='../weight/model_weight.h5', ve
 
     x_train_char, x_train_type, y_train = prepare_feature(best_processed_path, option='train')
     x_test_char, x_test_type, y_test = prepare_feature(best_processed_path, option='test')
-    if os.path.isdir(os.path.join(best_processed_path, 'dev')):
-        dev = True
-        x_dev_char, x_dev_type, y_dev = prepare_feature(best_processed_path, option='dev')
+    if os.path.isdir(os.path.join(best_processed_path, 'val')):
+        validation_set = True
+        x_val_char, x_val_type, y_val = prepare_feature(best_processed_path, option='val')
 
     callbacks_list = [
         ReduceLROnPlateau(),
@@ -180,10 +180,10 @@ def train_model(best_processed_path, weight_path='../weight/model_weight.h5', ve
     train_params = [(10, 256), (3, 512), (3, 2048), (3, 4096), (3, 8192)]
     for (epochs, batch_size) in train_params:
         print("train with {} epochs and {} batch size".format(epochs, batch_size))
-        if dev:
+        if validation_set:
             model.fit([x_train_char, x_train_type], y_train, epochs=epochs, batch_size=batch_size, verbose=verbose,
                       callbacks=callbacks_list,
-                      validation_data=([x_dev_char, x_dev_type], y_dev))
+                      validation_data=([x_val_char, x_val_type], y_val))
         else:
             model.fit([x_train_char, x_train_type], y_train, epochs=epochs, batch_size=batch_size, verbose=verbose,
                       callbacks=callbacks_list)
@@ -192,7 +192,7 @@ def train_model(best_processed_path, weight_path='../weight/model_weight.h5', ve
 
 def evaluate(best_processed_path, model):
     """
-    Evaluate model with splitted testing set
+    Evaluate model on splitted 10 percent testing set
     """
     x_test_char, x_test_type, y_test = prepare_feature(best_processed_path, option='test')
 
