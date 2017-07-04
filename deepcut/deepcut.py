@@ -2,10 +2,10 @@ import os
 import pandas as pd
 
 from .model import get_convo_nn2
-from .utils import create_n_gram_df, create_char_dict, pad_dict, CHARS_MAP, CHAR_TYPES_MAP 
+from .utils import create_n_gram_df, create_char_dict, pad_dict, CHARS_MAP, CHAR_TYPES_MAP
 
 module_path = os.path.dirname(__file__)
-weight_path = os.path.join(module_path, 'weight', 'best_cnn3.h5')
+weight_path = os.path.join(module_path, 'weight', 'cnn_without_ne_ab.h5')
 
 # load model when importing library
 model = get_convo_nn2()
@@ -53,4 +53,3 @@ def tokenize(text):
             tokens.append(word)
             word = ''
     return tokens
-

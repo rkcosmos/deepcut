@@ -10,11 +10,14 @@ Faster tokenization by code refactorization from our new contributor: Titipat Ac
 
 ## Performance
 
-The Convolutional Neural network is trained from 90% of NECTEC's BEST corpus(consists of 4 sections, article, news, novel and encyclopedia) and test on the rest 10%. It is a binary classification model trying to predict whether a character is the beginning of word or not. The results calculated from only 'true' class are as follow
+The Convolutional Neural network is trained from 90% of NECTEC's BEST corpus
+(consists of 4 sections, article, news, novel and encyclopedia) and test on the rest 10%.
+It is a binary classification model trying to predict whether a character is the beginning of word or not.
+The results calculated from only 'true' class are as follow
 
-* f1 score:  98.8%
-* precision score:  98.6%
-* recall score:  99.1%
+* f1 score:  98.12%
+* precision score:  97.79%
+* recall score:  98.46%
 
 ## Installation
 
@@ -39,15 +42,15 @@ python setup.py install
 Make sure you are using `tensorflow` backend in `Keras` by making sure `~/.keras/keras.json` is as follows (see also https://keras.io/backend/)
 
 ```bash
-  {
-    "floatx": "float32",
-    "epsilon": 1e-07,
-    "backend": "tensorflow",
-    "image_data_format": "channels_last"
-  }
+{
+  "floatx": "float32",
+  "epsilon": 1e-07,
+  "backend": "tensorflow",
+  "image_data_format": "channels_last"
+}
 ```
 
-We do not add `tensorflow` in automatic installation process because it has cpu and gpu version. Installing cpu version to everyone might break those who already have gpu version installed. So please install tensorflow yourself following this guildline https://www.tensorflow.org/install/. 
+We do not add `tensorflow` in automatic installation process because it has cpu and gpu version. Installing cpu version to everyone might break those who already have gpu version installed. So please install tensorflow yourself following this guildline https://www.tensorflow.org/install/.
 
 ## Usage
 
