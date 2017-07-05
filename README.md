@@ -15,9 +15,9 @@ The Convolutional Neural network is trained from 90% of NECTEC's BEST corpus
 It is a binary classification model trying to predict whether a character is the beginning of word or not.
 The results calculated from only 'true' class are as follow
 
-* f1 score:  98.12%
-* precision score:  97.79%
-* recall score:  98.46%
+* f1 score:  98.1%
+* precision score:  97.8%
+* recall score:  98.5%
 
 ## Installation
 
@@ -80,5 +80,9 @@ Any suggestion and comment are welcome, please post it in issue section.
 * Rakpong Kittinaradorn
 * Korakot Chaovavanich
 * Titipat Achakulvisut
+
+## Partner Organizations
+
+* True Corporation
 
 And we are open for contribution and collaboration.
