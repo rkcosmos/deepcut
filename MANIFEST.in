@@ -2,4 +2,4 @@ include LICENSE.txt
 include README.md
 
 # Include the data files
-include deepcut/weight/best_cnn3.h5
+include deepcut/weight/cnn_without_ne_ab.h5
