@@ -4,9 +4,10 @@
 
 A Thai word tokenization library using Deep Neural Network.
 
-## What's new on version 0.5.1.0
+## What's new?
 
-Faster tokenization by code refactorization from our new contributor: Titipat Achakulvisut
+* v0.5.2.0: Better weight matrix
+* v0.5.1.0: Faster tokenization by code refactorization from our new contributor: Titipat Achakulvisut
 
 ## Performance
 
