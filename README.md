@@ -55,21 +55,23 @@ We do not add `tensorflow` in automatic installation process because it has cpu 
 
 ### Docker
 
-Install Docker on your machine: 
+Install Docker on your machine 
 
+For Linux:
 ```bash
 curl -sSL https://get.docker.com | sudo sh
 docker build -t deepcut 
 ```
-Go watching a 2-hr movie.
+
+For other OS: see https://docs.docker.com/engine/installation/
 
 To run this Docker image:
 
 ```bash
 docker run --rm -it deepcut
 ```
-It will open a shell for us to play with deepcut.
 
+It will open a shell for us to play with deepcut.
 
 ## Usage
 
