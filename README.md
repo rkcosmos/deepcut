@@ -53,6 +53,24 @@ Make sure you are using `tensorflow` backend in `Keras` by making sure `~/.keras
 
 We do not add `tensorflow` in automatic installation process because it has cpu and gpu version. Installing cpu version to everyone might break those who already have gpu version installed. So please install tensorflow yourself following this guildline https://www.tensorflow.org/install/.
 
+### Docker
+
+Install Docker on your machine: 
+
+```bash
+curl -sSL https://get.docker.com | sudo sh
+docker build -t deepcut 
+```
+Go watching a 2-hr movie.
+
+To run this Docker image:
+
+```bash
+docker run --rm -it deepcut
+```
+It will open a shell for us to play with deepcut.
+
+
 ## Usage
 
 ```python
@@ -79,8 +97,9 @@ Any suggestion and comment are welcome, please post it in issue section.
 ## Contributors
 
 * Rakpong Kittinaradorn
-* Korakot Chaovavanich
-* Titipat Achakulvisut
+* [Korakot Chaovavanich](https://github.com/korakot)
+* [Titipat Achakulvisut](https://github.com/titipata)
+* [Chanwit Kaewkasi](https://github.com/chanwit)
 
 ## Partner Organizations
 
