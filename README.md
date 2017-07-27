@@ -96,7 +96,7 @@ Any suggestion and comment are welcome, please post it in issue section.
 
 ## Contributors
 
-* Rakpong Kittinaradorn
+* [Rakpong Kittinaradorn](https://github.com/rkcosmos)
 * [Korakot Chaovavanich](https://github.com/korakot)
 * [Titipat Achakulvisut](https://github.com/titipata)
 * [Chanwit Kaewkasi](https://github.com/chanwit)
