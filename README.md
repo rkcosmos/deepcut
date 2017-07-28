@@ -60,7 +60,7 @@ Install Docker on your machine
 For Linux:
 ```bash
 curl -sSL https://get.docker.com | sudo sh
-docker build -t deepcut 
+docker build -t deepcut .
 ```
 
 For other OS: see https://docs.docker.com/engine/installation/
