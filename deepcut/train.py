@@ -159,6 +159,8 @@ def train_model(best_processed_path, weight_path='../weight/model_weight.h5', ve
 
     x_train_char, x_train_type, y_train = prepare_feature(best_processed_path, option='train')
     x_test_char, x_test_type, y_test = prepare_feature(best_processed_path, option='test')
+
+    validation_set = False
     if os.path.isdir(os.path.join(best_processed_path, 'val')):
         validation_set = True
         x_val_char, x_val_type, y_val = prepare_feature(best_processed_path, option='val')
