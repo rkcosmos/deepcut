@@ -78,7 +78,23 @@ def _document_frequency(X):
 
 class DeepcutTokenizer(object):
     """
-    Class for tokenizing given documents using deepcut library
+    Class for tokenizing given Thai text documents using deepcut library
+
+    Parameters
+    ==========
+    ngram_range : tuple, tuple for ngram range for vocabulary, (1, 1) for unigram
+        and (1, 2) for bigram
+    stop_words : list or set, list or set of stop words to be removed
+        if None, max_df can be set to value [0.7, 1.0) to automatically remove
+        vocabulary
+    max_features : int or None, if provided, only consider number of vocabulary
+        ordered by term frequencies
+    max_df : float in range [0.0, 1.0] or int, default=1.0
+        ignore terms that have a document frequency higher than the given threshold
+    min_df : float in range [0.0, 1.0] or int, default=1
+        ignore terms that have a document frequency lower than the given threshold
+    dtype : type, optional
+
 
     Example
     =======
@@ -98,13 +114,14 @@ class DeepcutTokenizer(object):
     """
 
     def __init__(self, ngram_range=(1, 1), stop_words=None,
-                 max_df=1.0, min_df=1, dtype=np.float64):
+                 max_df=1.0, min_df=1, max_features=None, dtype=np.float64):
         self.vocabulary_ = {}
         self.ngram_range = ngram_range
         self.stop_words = stop_words
         self.dtype = dtype
         self.max_df = max_df
         self.min_df = min_df
+        self.max_features = max_features
 
 
     def _word_ngrams(self, tokens):
@@ -228,7 +245,7 @@ class DeepcutTokenizer(object):
         X, vocabulary, _ = self._limit_features(X, self.vocabulary_,
                                                 max_doc_count,
                                                 min_doc_count,
-                                                None)
+                                                self.max_features)
         self.vocabulary_ = vocabulary
 
         return X
