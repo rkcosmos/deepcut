@@ -1,5 +1,9 @@
 import os
+import numbers
+import numpy as np
 import pandas as pd
+import scipy.sparse as sp
+from itertools import chain
 
 from .model import get_convo_nn2
 from .utils import create_n_gram_df, create_char_dict, pad_dict, CHARS_MAP, CHAR_TYPES_MAP
@@ -13,7 +17,7 @@ model.load_weights(weight_path)
 
 def tokenize(text):
     """
-    Tokenize Thai text string
+    Tokenize given Thai text string
 
     Input
     =====
@@ -22,9 +26,18 @@ def tokenize(text):
     Output
     ======
     tokens: list, list of tokenized words
+
+    Example
+    =======
+    >> deepcut.tokenize('ตัดคำได้ดีมาก')
+    >> ['ตัด','คำ','ได้','ดี','มาก']
+
     """
     n_pad = 21
     n_pad_2 = int((n_pad - 1)/2)
+
+    if len(text) == 0:
+        return [''] # case of empty string
 
     char_dict = create_char_dict(text)
     char_dict_pad = pad_dict(char_dict, n_pad=n_pad)
@@ -53,3 +66,195 @@ def tokenize(text):
             tokens.append(word)
             word = ''
     return tokens
+
+
+def _document_frequency(X):
+    """Count the number of non-zero values for each feature in sparse X."""
+    if sp.isspmatrix_csr(X):
+        return np.bincount(X.indices, minlength=X.shape[1])
+    else:
+        return np.diff(sp.csc_matrix(X, copy=False).indptr)
+
+
+class DeepcutTokenizer(object):
+    """
+    Class for tokenizing given Thai text documents using deepcut library
+
+    Parameters
+    ==========
+    ngram_range : tuple, tuple for ngram range for vocabulary, (1, 1) for unigram
+        and (1, 2) for bigram
+    stop_words : list or set, list or set of stop words to be removed
+        if None, max_df can be set to value [0.7, 1.0) to automatically remove
+        vocabulary
+    max_features : int or None, if provided, only consider number of vocabulary
+        ordered by term frequencies
+    max_df : float in range [0.0, 1.0] or int, default=1.0
+        ignore terms that have a document frequency higher than the given threshold
+    min_df : float in range [0.0, 1.0] or int, default=1
+        ignore terms that have a document frequency lower than the given threshold
+    dtype : type, optional
+
+
+    Example
+    =======
+    raw_documents = ['ฉันอยากกินข้าวของฉัน',
+                     'ฉันอยากกินไก่',
+                     'อยากนอนอย่างสงบ']
+    tokenizer = DeepcutTokenizer(ngram_range=(1, 1))
+    X = tokenizer.fit_tranform(raw_documents) # document-term matrix in sparse CSR format
+
+    >> X.todense()
+    >> [[0, 0, 1, 0, 1, 0, 2, 1],
+        [0, 1, 1, 0, 1, 0, 1, 0],
+        [1, 0, 0, 1, 1, 1, 0, 0]]
+    >> tokenizer.vocabulary_
+    >> {'นอน': 0, 'ไก่': 1, 'กิน': 2, 'อย่าง': 3, 'อยาก': 4, 'สงบ': 5, 'ฉัน': 6, 'ข้าว': 7}
+
+    """
+
+    def __init__(self, ngram_range=(1, 1), stop_words=None,
+                 max_df=1.0, min_df=1, max_features=None, dtype=np.float64):
+        self.vocabulary_ = {}
+        self.ngram_range = ngram_range
+        self.stop_words = stop_words
+        self.dtype = dtype
+        self.max_df = max_df
+        self.min_df = min_df
+        self.max_features = max_features
+
+
+    def _word_ngrams(self, tokens):
+        """
+        Turn tokens into a tokens of n-grams
+
+        ref: https://github.com/scikit-learn/scikit-learn/blob/ef5cb84a/sklearn/feature_extraction/text.py#L124-L153
+        """
+        # handle stop words
+        if self.stop_words is not None:
+            tokens = [w for w in tokens if w not in self.stop_words]
+
+        # handle token n-grams
+        min_n, max_n = self.ngram_range
+        if max_n != 1:
+            original_tokens = tokens
+            if min_n == 1:
+                # no need to do any slicing for unigrams
+                # just iterate through the original tokens
+                tokens = list(original_tokens)
+                min_n += 1
+            else:
+                tokens = []
+
+            n_original_tokens = len(original_tokens)
+
+            # bind method outside of loop to reduce overhead
+            tokens_append = tokens.append
+            space_join = " ".join
+
+            for n in range(min_n,
+                            min(max_n + 1, n_original_tokens + 1)):
+                for i in range(n_original_tokens - n + 1):
+                    tokens_append(space_join(original_tokens[i: i + n]))
+
+        return tokens
+
+
+    def _limit_features(self, X, vocabulary,
+                        high=None, low=None, limit=None):
+        """Remove too rare or too common features.
+
+        ref: https://github.com/scikit-learn/scikit-learn/blob/ef5cb84a/sklearn/feature_extraction/text.py#L734-L773
+        """
+        if high is None and low is None and limit is None:
+            return X, set()
+
+        # Calculate a mask based on document frequencies
+        dfs = _document_frequency(X)
+        tfs = np.asarray(X.sum(axis=0)).ravel()
+        mask = np.ones(len(dfs), dtype=bool)
+        if high is not None:
+            mask &= dfs <= high
+        if low is not None:
+            mask &= dfs >= low
+        if limit is not None and mask.sum() > limit:
+            mask_inds = (-tfs[mask]).argsort()[:limit]
+            new_mask = np.zeros(len(dfs), dtype=bool)
+            new_mask[np.where(mask)[0][mask_inds]] = True
+            mask = new_mask
+
+        new_indices = np.cumsum(mask) - 1  # maps old indices to new
+        removed_terms = set()
+        for term, old_index in list(vocabulary.items()):
+            if mask[old_index]:
+                vocabulary[term] = new_indices[old_index]
+            else:
+                del vocabulary[term]
+                removed_terms.add(term)
+        kept_indices = np.where(mask)[0]
+        if len(kept_indices) == 0:
+            raise ValueError("After pruning, no terms remain. Try a lower"
+                             " min_df or a higher max_df.")
+        return X[:, kept_indices], vocabulary, removed_terms
+
+
+    def transform(self, raw_documents, new_document=False):
+        n_doc = len(raw_documents)
+        tokenized_documents = []
+        for doc in raw_documents:
+            tokens = tokenize(doc) # method in this file
+            tokens = self._word_ngrams(tokens)
+            tokenized_documents.append(tokens)
+
+        if new_document:
+            self.vocabulary_ = {v: k for k, v in enumerate(set(chain.from_iterable(tokenized_documents)))}
+
+        values, row_indices, col_indices = [], [], []
+        for r, tokens in enumerate(tokenized_documents):
+            tokens = self._word_ngrams(tokens)
+            feature = {}
+            for token in tokens:
+                word_index = self.vocabulary_.get(token)
+                if word_index is not None:
+                    if word_index not in feature.keys():
+                        feature[word_index] = 1
+                    else:
+                        feature[word_index] += 1
+            for c, v in feature.items():
+                values.append(v)
+                row_indices.append(r)
+                col_indices.append(c)
+
+        # document-term matrix in CSR format
+        X = sp.csr_matrix((values, (row_indices, col_indices)),
+                          shape=(n_doc, len(self.vocabulary_)),
+                          dtype=self.dtype)
+
+        # truncate vocabulary by max_df and min_df
+        max_df = self.max_df
+        min_df = self.min_df
+        max_doc_count = (max_df
+                         if isinstance(max_df, numbers.Integral)
+                         else max_df * n_doc)
+        min_doc_count = (min_df
+                         if isinstance(min_df, numbers.Integral)
+                         else min_df * n_doc)
+        if max_doc_count < min_doc_count:
+            raise ValueError(
+                "max_df corresponds to < documents than min_df")
+        X, vocabulary, _ = self._limit_features(X, self.vocabulary_,
+                                                max_doc_count,
+                                                min_doc_count,
+                                                self.max_features)
+        self.vocabulary_ = vocabulary
+
+        return X
+
+
+    def fit_tranform(self, raw_documents):
+        """
+        Transform given list of raw_documents to document-term matrix in
+        sparse CSR format (see scipy)
+        """
+        X = self.transform(raw_documents, new_document=True)
+        return X
