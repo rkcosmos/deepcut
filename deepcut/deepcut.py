@@ -1,4 +1,5 @@
 import os
+import six
 import numbers
 import numpy as np
 import pandas as pd
@@ -7,6 +8,7 @@ from itertools import chain
 
 from .model import get_convo_nn2
 from .utils import create_n_gram_df, create_char_dict, pad_dict, CHARS_MAP, CHAR_TYPES_MAP
+from .stop_words import THAI_STOP_WORDS
 
 module_path = os.path.dirname(__file__)
 weight_path = os.path.join(module_path, 'weight', 'cnn_without_ne_ab.h5')
@@ -76,6 +78,21 @@ def _document_frequency(X):
         return np.diff(sp.csc_matrix(X, copy=False).indptr)
 
 
+def _check_stop_list(stop):
+    """
+    Check stop words list
+    ref: https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/feature_extraction/text.py#L87-L95
+    """
+    if stop == "thai":
+        return THAI_STOP_WORDS
+    elif isinstance(stop, six.string_types):
+        raise ValueError("not a built-in stop list: %s" % stop)
+    elif stop is None:
+        return None
+    else:               # assume it's a collection
+        return frozenset(stop)
+
+
 class DeepcutTokenizer(object):
     """
     Class for tokenizing given Thai text documents using deepcut library
@@ -86,7 +103,7 @@ class DeepcutTokenizer(object):
         and (1, 2) for bigram
     stop_words : list or set, list or set of stop words to be removed
         if None, max_df can be set to value [0.7, 1.0) to automatically remove
-        vocabulary
+        vocabulary. If using "thai", this will use list of pre-populated stop words
     max_features : int or None, if provided, only consider number of vocabulary
         ordered by term frequencies
     max_df : float in range [0.0, 1.0] or int, default=1.0
@@ -117,11 +134,11 @@ class DeepcutTokenizer(object):
                  max_df=1.0, min_df=1, max_features=None, dtype=np.float64):
         self.vocabulary_ = {}
         self.ngram_range = ngram_range
-        self.stop_words = stop_words
         self.dtype = dtype
         self.max_df = max_df
         self.min_df = min_df
         self.max_features = max_features
+        self.stop_words = _check_stop_list(stop_words)
 
 
     def _word_ngrams(self, tokens):
