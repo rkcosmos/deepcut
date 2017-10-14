@@ -9,7 +9,7 @@ setup(
     name='deepcut',
     packages=['deepcut'],
     include_package_data=True,
-    version='0.5.2.0',
+    version='0.6.0.0',
     install_requires=['keras>=2.0.0', 'pandas',
                       'scipy', 'numpy', 'scikit-learn', 'h5py'],
     license='MIT',

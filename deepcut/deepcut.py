@@ -3,6 +3,7 @@ import six
 import numbers
 import numpy as np
 import pandas as pd
+import re
 import scipy.sparse as sp
 from itertools import chain
 
@@ -32,7 +33,7 @@ def tokenize(text):
     Example
     =======
     >> deepcut.tokenize('ตัดคำได้ดีมาก')
-    >> ['ตัด','คำ','ได้','ดี','มาก']
+    >> ['ตัดคำ','ได้','ดี','มาก']
 
     """
     n_pad = 21
@@ -60,6 +61,15 @@ def tokenize(text):
     y_predict = (y_predict.ravel() > 0.5).astype(int)
     word_end = list(y_predict[1:]) + [1]
 
+    try:
+        with open('custom_dict.txt') as f:
+            word_list = f.readlines()
+        for word in word_list:
+            word = word.strip('\n')
+            word_end = _custom_dict(word, text, word_end)
+    except:
+        pass
+
     tokens = []
     word = ''
     for char, w_e in zip(text, word_end):
@@ -68,6 +78,24 @@ def tokenize(text):
             tokens.append(word)
             word = ''
     return tokens
+
+def _custom_dict(word, text, word_end):
+    word_length = len(word)
+    initial_loc = 0
+
+    while True:
+        try:
+            start_char = re.search(word, text).start()
+            first_char = start_char+initial_loc
+            last_char = first_char+word_length-1
+
+            initial_loc += start_char+word_length
+            text = text[start_char+word_length:]
+            word_end[first_char:last_char] = (word_length-1)*[0]
+            word_end[last_char] = 1
+        except:
+            break
+    return word_end
 
 
 def _document_frequency(X):

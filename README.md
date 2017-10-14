@@ -6,6 +6,7 @@ A Thai word tokenization library using Deep Neural Network.
 
 ## What's new?
 
+* v0.6: Add stopwords, updated weight with semi-supervised learning, custom dictionary
 * v0.5.2.0: Better weight matrix
 * v0.5.1.0: Faster tokenization by code refactorization from our new contributor: Titipat Achakulvisut
 
@@ -55,7 +56,7 @@ We do not add `tensorflow` in automatic installation process because it has cpu 
 
 ### Docker
 
-Install Docker on your machine 
+Install Docker on your machine
 
 For Linux:
 ```bash
@@ -83,8 +84,20 @@ deepcut.tokenize('ตัดคำได้ดีมาก')
 Output will be in list format
 
 ```bash
-['ตัด','คำ','ได้','ดี','มาก']
+['ตัดคำ','ได้','ดี','มาก']
 ```
+
+#### Custom Dictionary
+
+User can now add custom dictionary by creating custom_dict.txt file with one word per line like this.
+
+```bash
+ขี้เกียจ
+โรงเรียน
+```
+
+The file should be placed in your working directory.
+
 
 ## Notes
 
