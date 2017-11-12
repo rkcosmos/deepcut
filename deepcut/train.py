@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# encoding: utf-8
 import os
 from glob import glob
 import pandas as pd

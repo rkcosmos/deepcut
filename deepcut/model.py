@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# encoding: utf-8
 from keras.models import Model
 from keras.layers import Input, Dense, Embedding, \
     Concatenate, Flatten, SpatialDropout1D, \
