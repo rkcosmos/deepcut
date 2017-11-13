@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 import os
+import sys
 import six
 import numbers
 import numpy as np
@@ -44,7 +45,7 @@ def tokenize(text):
     if len(text) == 0:
         return [''] # case of empty string
 
-    if isinstance(text, str):
+    if isinstance(text, str) and sys.version_info.major == 2:
         text = text.decode('utf-8')
 
     char_dict = create_char_dict(text)
@@ -70,7 +71,7 @@ def tokenize(text):
         with open('custom_dict.txt') as f:
             word_list = f.readlines()
         for word in word_list:
-            if isinstance(word, str):
+            if isinstance(word, str) and sys.version_info.major == 2:
                 word = word.decode('utf-8')
             word = word.strip('\n')
             word_end = _custom_dict(word, text, word_end)
@@ -85,6 +86,7 @@ def tokenize(text):
             tokens.append(word)
             word = ''
     return tokens
+
 
 def _custom_dict(word, text, word_end):
     word_length = len(word)
