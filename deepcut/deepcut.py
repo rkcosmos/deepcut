@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# encoding: utf-8
 import os
 import six
 import numbers
@@ -42,6 +44,9 @@ def tokenize(text):
     if len(text) == 0:
         return [''] # case of empty string
 
+    if isinstance(text, str):
+        text = text.decode('utf-8')
+
     char_dict = create_char_dict(text)
     char_dict_pad = pad_dict(char_dict, n_pad=n_pad)
     char_df = pd.DataFrame(char_dict_pad)
@@ -65,6 +70,8 @@ def tokenize(text):
         with open('custom_dict.txt') as f:
             word_list = f.readlines()
         for word in word_list:
+            if isinstance(word, str):
+                word = word.decode('utf-8')
             word = word.strip('\n')
             word_end = _custom_dict(word, text, word_end)
     except:
