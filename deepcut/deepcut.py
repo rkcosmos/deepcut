@@ -1,25 +1,26 @@
 #!/usr/bin/env python
 # encoding: utf-8
-import os
-import sys
-import six
 import numbers
-import numpy as np
-import pandas as pd
+import os
 import re
-import scipy.sparse as sp
+import sys
 from itertools import chain
 
+import numpy as np
+import pandas as pd
+import scipy.sparse as sp
+import six
+from keras import backend
+
 from .model import get_convo_nn2
-from .utils import create_n_gram_df, create_char_dict, pad_dict, CHARS_MAP, CHAR_TYPES_MAP
 from .stop_words import THAI_STOP_WORDS
+from .utils import (CHAR_TYPES_MAP, CHARS_MAP, create_char_dict,
+                    create_n_gram_df, pad_dict)
 
-module_path = os.path.dirname(__file__)
-weight_path = os.path.join(module_path, 'weight', 'cnn_without_ne_ab.h5')
+MODULE_PATH = os.path.dirname(__file__)
+WEIGHT_PATH = os.path.join(MODULE_PATH, 'weight', 'cnn_without_ne_ab.h5')
 
-# load model when importing library
-model = get_convo_nn2()
-model.load_weights(weight_path)
+TOKENIZER = None
 
 def tokenize(text):
     """
@@ -39,53 +40,10 @@ def tokenize(text):
     >> ['ตัดคำ','ได้','ดี','มาก']
 
     """
-    n_pad = 21
-    n_pad_2 = int((n_pad - 1)/2)
-
-    if len(text) == 0:
-        return [''] # case of empty string
-
-    if isinstance(text, str) and sys.version_info.major == 2:
-        text = text.decode('utf-8')
-
-    char_dict = create_char_dict(text)
-    char_dict_pad = pad_dict(char_dict, n_pad=n_pad)
-    char_df = pd.DataFrame(char_dict_pad)
-    char_df['char'] = char_df['char'].map(lambda x: CHARS_MAP.get(x, 80))
-    char_df['type'] = char_df['type'].map(lambda x: CHAR_TYPES_MAP.get(x, 4))
-    char_df_ngram = create_n_gram_df(char_df, n_pad=n_pad)
-
-    char_row = ['char' + str(i + 1) for i in range(n_pad_2)] + \
-               ['char-' + str(i + 1) for i in range(n_pad_2)] + ['char']
-    type_row = ['type' + str(i + 1) for i in range(n_pad_2)] + \
-               ['type-' + str(i + 1) for i in range(n_pad_2)] + ['type']
-
-    x_char = char_df_ngram[char_row].as_matrix()
-    x_type = char_df_ngram[type_row].as_matrix()
-
-    y_predict = model.predict([x_char, x_type])
-    y_predict = (y_predict.ravel() > 0.5).astype(int)
-    word_end = list(y_predict[1:]) + [1]
-
-    try:
-        with open('custom_dict.txt') as f:
-            word_list = f.readlines()
-        for word in word_list:
-            if isinstance(word, str) and sys.version_info.major == 2:
-                word = word.decode('utf-8')
-            word = word.strip('\n')
-            word_end = _custom_dict(word, text, word_end)
-    except:
-        pass
-
-    tokens = []
-    word = ''
-    for char, w_e in zip(text, word_end):
-        word += char
-        if w_e:
-            tokens.append(word)
-            word = ''
-    return tokens
+    global TOKENIZER
+    if not TOKENIZER:
+        TOKENIZER = DeepcutTokenizer()
+    return TOKENIZER.tokenize(text)
 
 
 def _custom_dict(word, text, word_end):
@@ -108,11 +66,12 @@ def _custom_dict(word, text, word_end):
 
 
 def _document_frequency(X):
-    """Count the number of non-zero values for each feature in sparse X."""
+    """
+    Count the number of non-zero values for each feature in sparse X.
+    """
     if sp.isspmatrix_csr(X):
         return np.bincount(X.indices, minlength=X.shape[1])
-    else:
-        return np.diff(sp.csc_matrix(X, copy=False).indptr)
+    return np.diff(sp.csc_matrix(X, copy=False).indptr)
 
 
 def _check_stop_list(stop):
@@ -126,8 +85,8 @@ def _check_stop_list(stop):
         raise ValueError("not a built-in stop list: %s" % stop)
     elif stop is None:
         return None
-    else:               # assume it's a collection
-        return frozenset(stop)
+    # assume it's a collection
+    return frozenset(stop)
 
 
 class DeepcutTokenizer(object):
@@ -168,7 +127,11 @@ class DeepcutTokenizer(object):
     """
 
     def __init__(self, ngram_range=(1, 1), stop_words=None,
-                 max_df=1.0, min_df=1, max_features=None, dtype=np.float64):
+                 max_df=1.0, min_df=1, max_features=None, dtype=np.dtype('float64')):
+        self.model = get_convo_nn2()
+        self.model.load_weights(WEIGHT_PATH)
+        self.graph = backend.get_session().graph # save graph for reference in async
+
         self.vocabulary_ = {}
         self.ngram_range = ngram_range
         self.dtype = dtype
@@ -207,7 +170,7 @@ class DeepcutTokenizer(object):
             space_join = " ".join
 
             for n in range(min_n,
-                            min(max_n + 1, n_original_tokens + 1)):
+                           min(max_n + 1, n_original_tokens + 1)):
                 for i in range(n_original_tokens - n + 1):
                     tokens_append(space_join(original_tokens[i: i + n]))
 
@@ -246,7 +209,7 @@ class DeepcutTokenizer(object):
                 del vocabulary[term]
                 removed_terms.add(term)
         kept_indices = np.where(mask)[0]
-        if len(kept_indices) == 0:
+        if not kept_indices:
             raise ValueError("After pruning, no terms remain. Try a lower"
                              " min_df or a higher max_df.")
         return X[:, kept_indices], vocabulary, removed_terms
@@ -312,3 +275,57 @@ class DeepcutTokenizer(object):
         """
         X = self.transform(raw_documents, new_document=True)
         return X
+
+    def tokenize(self, text):
+        n_pad = 21
+        n_pad_2 = int((n_pad - 1)/2)
+
+        if not text:
+            return [''] # case of empty string
+
+        if isinstance(text, str) and sys.version_info.major == 2:
+            text = text.decode('utf-8')
+
+        char_dict = create_char_dict(text)
+        char_dict_pad = pad_dict(char_dict, n_pad=n_pad)
+        char_df = pd.DataFrame(char_dict_pad)
+
+        char_df['char'] = char_df['char'].map(lambda x: CHARS_MAP.get(x, 80))
+        char_df['type'] = char_df['type'].map(lambda x: CHAR_TYPES_MAP.get(x, 4))
+        char_df_ngram = create_n_gram_df(char_df, n_pad=n_pad)
+
+        char_row = ['char' + str(i + 1) for i in range(n_pad_2)] + \
+                ['char-' + str(i + 1) for i in range(n_pad_2)] + ['char']
+        type_row = ['type' + str(i + 1) for i in range(n_pad_2)] + \
+                ['type-' + str(i + 1) for i in range(n_pad_2)] + ['type']
+
+        x_char = char_df_ngram[char_row].as_matrix()
+        x_type = char_df_ngram[type_row].as_matrix()
+
+        word_end = []
+        # Fix thread-related issue in Keras + TensorFlow + Flask async environment
+        # ref: https://github.com/keras-team/keras/issues/2397
+        with self.graph.as_default():
+            y_predict = self.model.predict([x_char, x_type])
+            y_predict = (y_predict.ravel() > 0.5).astype(int)
+            word_end = list(y_predict[1:]) + [1]
+
+        try:
+            with open('custom_dict.txt') as f:
+                word_list = f.readlines()
+            for word in word_list:
+                if isinstance(word, str) and sys.version_info.major == 2:
+                    word = word.decode('utf-8')
+                word = word.strip('\n')
+                word_end = _custom_dict(word, text, word_end)
+        except:
+            pass
+
+        tokens = []
+        word = ''
+        for char, w_e in zip(text, word_end):
+            word += char
+            if w_e:
+                tokens.append(word)
+                word = ''
+        return tokens
