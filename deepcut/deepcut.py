@@ -22,13 +22,17 @@ WEIGHT_PATH = os.path.join(MODULE_PATH, 'weight', 'cnn_without_ne_ab.h5')
 
 TOKENIZER = None
 
-def tokenize(text):
+def tokenize(text, custom_dict=None):
     """
     Tokenize given Thai text string
 
     Input
     =====
     text: str, Thai text string
+    custom_dict: str (or list), path to customized dictionary file
+        It allows the function not to tokenize given dictionary wrongly.
+        The file should contain custom words separated by line.
+        Alternatively, you can provide list of custom words too.
 
     Output
     ======
@@ -43,7 +47,7 @@ def tokenize(text):
     global TOKENIZER
     if not TOKENIZER:
         TOKENIZER = DeepcutTokenizer()
-    return TOKENIZER.tokenize(text)
+    return TOKENIZER.tokenize(text, custom_dict=custom_dict)
 
 
 def _custom_dict(word, text, word_end):
@@ -276,7 +280,7 @@ class DeepcutTokenizer(object):
         X = self.transform(raw_documents, new_document=True)
         return X
 
-    def tokenize(self, text):
+    def tokenize(self, text, custom_dict=None):
         n_pad = 21
         n_pad_2 = int((n_pad - 1)/2)
 
@@ -308,18 +312,24 @@ class DeepcutTokenizer(object):
         with self.graph.as_default():
             y_predict = self.model.predict([x_char, x_type])
             y_predict = (y_predict.ravel() > 0.5).astype(int)
-            word_end = list(y_predict[1:]) + [1]
+            word_end = y_predict[1:].tolist() + [1]
 
-        try:
-            with open('custom_dict.txt') as f:
-                word_list = f.readlines()
-            for word in word_list:
-                if isinstance(word, str) and sys.version_info.major == 2:
-                    word = word.decode('utf-8')
-                word = word.strip('\n')
-                word_end = _custom_dict(word, text, word_end)
-        except:
-            pass
+        if custom_dict is not None:
+            if isinstance(custom_dict, list):
+                word_list = custom_dict
+            else:
+                word_list = []
+                try:
+                    with open(custom_dict) as f:
+                        word_list = f.readlines()
+                except:
+                    pass
+            if len(word_list) > 0:
+                for word in word_list:
+                    if isinstance(word, str) and sys.version_info.major == 2:
+                        word = word.decode('utf-8')
+                    word = word.strip('\n')
+                    word_end = _custom_dict(word, text, word_end)
 
         tokens = []
         word = ''

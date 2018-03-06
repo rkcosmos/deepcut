@@ -89,14 +89,19 @@ Output will be in list format
 
 #### Custom Dictionary
 
-User can now add custom dictionary by creating custom_dict.txt file with one word per line like this.
+User can add custom dictionary by adding path to `.txt` file with one word per line like the following.
 
 ```bash
 ขี้เกียจ
 โรงเรียน
 ```
 
-The file should be placed in your working directory.
+The file can be placed as an argument in `tokenize` function e.g.
+
+```python
+deepcut.tokenize('ตัดคำได้ดีมาก', custom_dict='/path/to/custom_dict.txt')
+deepcut.tokenize('ตัดคำได้ดีมาก', custom_dict=['ดีมาก']) # alternatively, can provide a list
+```
 
 
 ## Notes
