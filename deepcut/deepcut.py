@@ -57,12 +57,12 @@ def _custom_dict(word, text, word_end):
     while True:
         try:
             start_char = re.search(word, text).start()
-            first_char = start_char+initial_loc
-            last_char = first_char+word_length-1
+            first_char = start_char + initial_loc
+            last_char = first_char + word_length - 1
 
-            initial_loc += start_char+word_length
-            text = text[start_char+word_length:]
-            word_end[first_char:last_char] = (word_length-1)*[0]
+            initial_loc += start_char + word_length
+            text = text[start_char + word_length:]
+            word_end[first_char:last_char] = (word_length - 1) * [0]
             word_end[last_char] = 1
         except:
             break

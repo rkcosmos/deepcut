@@ -100,7 +100,7 @@ The file can be placed as an argument in `tokenize` function e.g.
 
 ```python
 deepcut.tokenize('ตัดคำได้ดีมาก', custom_dict='/path/to/custom_dict.txt')
-deepcut.tokenize('ตัดคำได้ดีมาก', custom_dict=['ดีมาก']) # alternatively, can provide a list
+deepcut.tokenize('ตัดคำได้ดีมาก', custom_dict=['ดีมาก']) # alternatively, you can provide a list of custom dictionary
 ```
 
 
