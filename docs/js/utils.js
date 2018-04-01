@@ -63,10 +63,10 @@ function create_char_dict(text) {
         var char = text[i];
         if (CHARS.indexOf(char) > -1) {
             char_dict.push({'char': char,
-                              'type': CHAR_TYPE_FLATTEN.hasOwnProperty(char) ? CHAR_TYPE_FLATTEN[char] : 'o'})
+                              'type': CHAR_TYPE_FLATTEN.hasOwnProperty(char) ? CHAR_TYPE_FLATTEN[char] : 'o'});
         } else {
             char_dict.push({'char': 'other',
-                              'type': CHAR_TYPE_FLATTEN.get(char, 'o')})
+                              'type': CHAR_TYPE_FLATTEN.hasOwnProperty(char) ? CHAR_TYPE_FLATTEN[char] : 'o'});
         }
     }
     return char_dict;
