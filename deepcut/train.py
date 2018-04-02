@@ -94,7 +94,7 @@ def generate_best_dataset(best_path, output_path='cleaned_data', create_val=Fals
             files_train, files_val = train_test_split(files_train, random_state=0, test_size=0.1)
             val_words = generate_words(files_val)
             val_df = create_char_dataframe(val_words)
-            val_df.to_csv(os.path.join(output_path, 'val', 'df_best_{}_val.csv'.format(article_type)), random_state=0, index=False)
+            val_df.to_csv(os.path.join(output_path, 'val', 'df_best_{}_val.csv'.format(article_type)), index=False)
         train_words = generate_words(files_train)
         test_words = generate_words(files_test)
         train_df = create_char_dataframe(train_words)
@@ -167,6 +167,9 @@ def train_model(best_processed_path, weight_path='../weight/model_weight.h5', ve
         validation_set = True
         x_val_char, x_val_type, y_val = prepare_feature(best_processed_path, option='val')
 
+    if not os.path.isdir(os.path.dirname(weight_path)):
+        os.makedirs(os.path.dirname(weight_path)) # make directory if weight does not exist
+
     callbacks_list = [
         ReduceLROnPlateau(),
         ModelCheckpoint(
@@ -185,11 +188,15 @@ def train_model(best_processed_path, weight_path='../weight/model_weight.h5', ve
     for (epochs, batch_size) in train_params:
         print("train with {} epochs and {} batch size".format(epochs, batch_size))
         if validation_set:
-            model.fit([x_train_char, x_train_type], y_train, epochs=epochs, batch_size=batch_size, verbose=verbose,
+            model.fit([x_train_char, x_train_type], y_train,
+                      epochs=epochs, batch_size=batch_size,
+                      verbose=verbose,
                       callbacks=callbacks_list,
                       validation_data=([x_val_char, x_val_type], y_val))
         else:
-            model.fit([x_train_char, x_train_type], y_train, epochs=epochs, batch_size=batch_size, verbose=verbose,
+            model.fit([x_train_char, x_train_type], y_train,
+                      epochs=epochs, batch_size=batch_size,
+                      verbose=verbose,
                       callbacks=callbacks_list)
     return model
 
