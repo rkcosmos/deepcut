@@ -71,3 +71,41 @@ function create_char_dict(text) {
     }
     return char_dict;
 }
+
+function gen(text) {
+  var data = []
+  for (var i = 0; i < 10; i++) {
+    data.push(' ')
+  }
+
+  for (var j = 0; j < text.length; j++) {
+    data.push(text[j]);
+    i++;
+  }
+
+  for (var i = 0; i < 10; i++) {
+    data.push(' ')
+  }
+
+  return data;
+
+}
+
+function gen_input(text) {
+  var data = gen(text);
+  var x_char = [];
+  var x_type = [];
+  for (var i = 0; i < data.length; i++) {
+    x_char[i] = CHARS_MAP[data[i]];
+    var type = CHAR_TYPE_FLATTEN[data[i]];
+
+    if (typeof type == 'undefined') {
+      type = 'o';
+    }
+    x_type[i] = CHAR_TYPES_MAP[type];
+
+
+  }
+
+  return {"x_type": x_type, "x_char": x_char, "raw": data};
+}
