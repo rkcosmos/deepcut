@@ -25,29 +25,23 @@
 
           <div class="row">
             <div>Result:</div>
-            <div id="result"></div>
+            <div id="result" style="margin-top: 10px;"></div>
 
           </div>
 
-          <div id="btn-predict" class="waves-effect waves-light btn row">ตัดคำ</div>
-
-          <div id="loading" class="row red-text">กำลังโหลด Model ...</div>
+          <div class="center row">
+            <div id="btn-predict" class="waves-effect waves-light btn center">ตัดคำ</div>
+          </div>
+          <div id="loading" class="row red-text center">กำลังโหลด Model ...</div>
         </div>
       </div>
       <div class="col s0 l3"></div>
     </div>
 
-
-
-
-
     <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.6.1"></script>
     <script src="https://unpkg.com/keras-js"></script>
-    <!--<script src="./keras.min.js"></script>-->
     <script src="./js/utils.js"></script>
-    <script src="./numjs.min.js"></script>
 
     <script>
 
@@ -87,14 +81,12 @@
             var inputData = {"input_1": input_1, "input_2": input_2};
             var output = await model.predict(inputData);
 
-            //console.log("\nRESULT "+ i +": " + output.dense_2);
             predictions.push(output.dense_2[0]);
           }
 
-          console.log(predictions);
           result = parse_prediction(text, predictions);
+          console.log("compelted");
           $('#result').html(result.join(" | "));
-          console.log(text);
         })();
 
       }
