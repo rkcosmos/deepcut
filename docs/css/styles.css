@@ -1,0 +1,18 @@
+html {
+    font-family: 'CMUSansSerifBold', serif;
+}
+
+textarea.materialize-textarea, #result {
+    font-size: 20px;
+}
+
+#result {
+    min-height: 40px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.deepcut-title {
+    font-size: 30px;
+    padding-bottom: 0.45em;
+}
