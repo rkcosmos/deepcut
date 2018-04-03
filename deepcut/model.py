@@ -7,10 +7,10 @@ from keras.layers import Input, Dense, Embedding, \
 from keras.layers import TimeDistributed
 from keras.optimizers import Adam
 
-def conv_unit(inp, n_gram, no_word = 200, window = 2):
+def conv_unit(inp, n_gram, no_word=200, window=2):
     out = Conv1D(no_word, window, strides=1, padding="valid", activation='relu')(inp)
     out = TimeDistributed(Dense(5, input_shape=(n_gram, no_word)))(out)
-    out = ZeroPadding1D(padding=(0, window-1))(out)
+    out = ZeroPadding1D(padding=(0, window - 1))(out)
     return out
 
 def get_convo_nn2(no_word=200, n_gram=21, no_char=178):
@@ -23,10 +23,10 @@ def get_convo_nn2(no_word=200, n_gram=21, no_char=178):
 
     a_concat = []
     for i in range(1,9):
-        a_concat.append(conv_unit(a, n_gram, no_word, window = i))
+        a_concat.append(conv_unit(a, n_gram, no_word, window=i))
     for i in range(9,12):
-        a_concat.append(conv_unit(a, n_gram, no_word-50, window = i))
-    a_concat.append(conv_unit(a, n_gram, no_word-100, window = 12))
+        a_concat.append(conv_unit(a, n_gram, no_word - 50, window=i))
+    a_concat.append(conv_unit(a, n_gram, no_word - 100, window=12))
     a_sum = Maximum()(a_concat)
 
     b = Embedding(12, 12, input_length=n_gram)(input2)

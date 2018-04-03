@@ -7,15 +7,13 @@ import sys
 from itertools import chain
 
 import numpy as np
-import pandas as pd
 import scipy.sparse as sp
 import six
 from keras import backend
 
 from .model import get_convo_nn2
 from .stop_words import THAI_STOP_WORDS
-from .utils import (CHAR_TYPES_MAP, CHARS_MAP, create_char_dict,
-                    create_n_gram_df, pad_dict)
+from .utils import CHAR_TYPES_MAP, CHARS_MAP, create_feature_array
 
 MODULE_PATH = os.path.dirname(__file__)
 WEIGHT_PATH = os.path.join(MODULE_PATH, 'weight', 'cnn_without_ne_ab.h5')
@@ -290,22 +288,7 @@ class DeepcutTokenizer(object):
         if isinstance(text, str) and sys.version_info.major == 2:
             text = text.decode('utf-8')
 
-        char_dict = create_char_dict(text)
-        char_dict_pad = pad_dict(char_dict, n_pad=n_pad)
-        char_df = pd.DataFrame(char_dict_pad)
-
-        char_df['char'] = char_df['char'].map(lambda x: CHARS_MAP.get(x, 80))
-        char_df['type'] = char_df['type'].map(lambda x: CHAR_TYPES_MAP.get(x, 4))
-        char_df_ngram = create_n_gram_df(char_df, n_pad=n_pad)
-
-        char_row = ['char' + str(i + 1) for i in range(n_pad_2)] + \
-                ['char-' + str(i + 1) for i in range(n_pad_2)] + ['char']
-        type_row = ['type' + str(i + 1) for i in range(n_pad_2)] + \
-                ['type-' + str(i + 1) for i in range(n_pad_2)] + ['type']
-
-        x_char = char_df_ngram[char_row].as_matrix()
-        x_type = char_df_ngram[type_row].as_matrix()
-
+        x_char, x_type = create_feature_array(text, n_pad=n_pad)
         word_end = []
         # Fix thread-related issue in Keras + TensorFlow + Flask async environment
         # ref: https://github.com/keras-team/keras/issues/2397
