@@ -38,7 +38,7 @@ function onBtnPredictClicked() {
         }
 
         result = parse_prediction(text, predictions);
-        console.log("compelted");
+        console.log("completed");
         $('#result').html(result.join(" | "));
     })();
 
@@ -84,7 +84,7 @@ function gen_input(text) {
 }
 
 function parse_prediction(text, prediction) {
-    var prediction = prediction.slice(1).concat(1)
+    var prediction = prediction.slice(1).concat(1);
 
     tokenized_text = Array();
     var count = 0;
