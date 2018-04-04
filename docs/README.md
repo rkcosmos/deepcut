@@ -18,7 +18,8 @@ model.save('model_lite.h5')
 To run the demo locally, you can use `http.server` from Python.
 
 ```bash
-python -m http.server 8000
+python -m http.server 8000 # Python 3
+python -m SimpleHTTPServer 8000 # Python 2
 ```
 
 The demo can be accessed at `http://localhost:8000/`
