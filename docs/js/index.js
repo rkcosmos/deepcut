@@ -16,7 +16,10 @@ model.ready()
 $(document).ready(initPage);
 
 function initPage() {
+    // detect keyup in textarea, then call prediction function    
     $('#message').keyup(onBtnPredictClicked);
+    // detect click on load example button, and call function
+    $('#loadexample').click(onClickLoadExample);
 }
 
 function onBtnPredictClicked() {
