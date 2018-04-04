@@ -4,13 +4,19 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+  <!-- og stuffs -->
   <meta property="og:title" content="Deepcut JS">
   <meta property="og:description" content="ตัดคำภาษาไทยบน web browser ด้วย Deepcut JS (experiment version), powered by KerasJS">
   <meta property="og:url" content="https://rkcosmos.github.io/deepcut/">
   <meta property="og:site_name" content="DeepcutJS">
   <meta property="og:image" content="https://rkcosmos.github.io/deepcut/css/deepcutjs.png">
+  <!-- materializecss -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
+  <!-- cmu font -->
   <link rel="stylesheet" media="screen" href="https://fontlibrary.org/face/cmu-sans-serif" type="text/css" />
+  <!-- materializecss icon -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!-- custom stylesheet -->
   <link rel="stylesheet" href="./css/styles.css" type="text/css" />
 </head>
 
@@ -20,16 +26,21 @@
     <div class="col s0 l3"></div>
     <div class="card col s12 l6">
       <div class="card-content">
-
         <h5 class="red-text deepcut-title">Deepcut JS (Experiment)</h5>
 
+        <!-- input textarea part -->
         <div class="input-field">
           <textarea id="message" class="materialize-textarea"></textarea>
           <label for="textarea1">ลองพิมพ์ดู!</label>
         </div>
+        
+        <!-- result part -->
         <div>ผลการตัดคำ :</div>
         <div id="result"></div>
         <div id="loading" class="row red-text center">กำลังโหลด Model ...</div>
+
+        <!-- Load example content button -->
+        <a id="loadexample" class="waves-effect waves-light btn right"><i class="material-icons left">file_upload</i>โหลดตัวอย่าง</a>
       </div>
     </div>
     <div class="col s0 l3"></div>
@@ -38,7 +49,11 @@
   <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
   <script src="https://unpkg.com/keras-js"></script>
+  <!-- load example functions -->
+  <script src="./js/load_example.js"></script>
+  <!-- utils functions -->
   <script src="./js/utils.js"></script>
+  <!-- main js -->
   <script src="./js/index.js"></script>
 
 </body>
