@@ -68,12 +68,18 @@ function gen_input(text) {
         var x_char = Array();
         var x_type = Array();
         for (var j = 0; j < characters.length; j++) {
+
+            var char_map = CHARS_MAP[characters[j]];
+            if (typeof char_map == 'undefined') {
+                char_map = 80;
+            }
+
             var type = CHAR_TYPE_FLATTEN[characters[j]];
             if (typeof type == 'undefined') {
                 type = 'o';
             }
 
-            x_char[j] = CHARS_MAP[characters[j]];
+            x_char[j] = char_map;
             x_type[j] = CHAR_TYPES_MAP[type];
         }
         X_char[i] = x_char;
