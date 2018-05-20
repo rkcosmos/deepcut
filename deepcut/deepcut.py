@@ -211,7 +211,7 @@ class DeepcutTokenizer(object):
                 del vocabulary[term]
                 removed_terms.add(term)
         kept_indices = np.where(mask)[0]
-        if not kept_indices:
+        if len(kept_indices) == 0:
             raise ValueError("After pruning, no terms remain. Try a lower"
                              " min_df or a higher max_df.")
         return X[:, kept_indices], vocabulary, removed_terms

@@ -87,6 +87,21 @@ Output will be in list format
 ['ตัดคำ','ได้','ดี','มาก']
 ```
 
+#### Bag-of-word transformation
+
+We implemented tokenizer which works similar to
+[`CountVectorizer`](http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html) from `scikit-learn`.
+Here is an example usage:
+
+```python
+from deepcut import DeepcutTokenizer
+tokenizer = DeepcutTokenizer(ngram_range=(1,1),
+                             max_df=1.0, min_df=0.0)
+X = tokenizer.fit_tranform(['ฉันบินได้', 'ฉันกินข้าว', 'ฉันอยากบิน']) # 3 x 4 CSR sparse matrix
+print(tokenizer.vocabulary_) # {'กิน': 0, 'ข้าว': 3, 'อยาก': 1, 'ได้': 2}
+```
+
+
 #### Custom Dictionary
 
 User can add custom dictionary by adding path to `.txt` file with one word per line like the following.
