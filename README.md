@@ -6,14 +6,15 @@ A Thai word tokenization library using Deep Neural Network.
 
 ## What's new?
 
-* v0.6: Add stopwords, updated weight with semi-supervised learning, custom dictionary
-* v0.5.2.0: Better weight matrix
-* v0.5.1.0: Faster tokenization by code refactorization from our new contributor: Titipat Achakulvisut
+* Deepcut JS, try tokenizing Thai text on browser [here](https://rkcosmos.github.io/deepcut/)
+* `v0.6` Add stop words, updated weight with semi-supervised learning, custom dictionary
+* `v0.5.2` Better weight matrix
+* `v0.5.1` Faster tokenization by code refactorization from our new contributor: Titipat Achakulvisut
 
 ## Performance
 
-The Convolutional Neural network is trained from 90% of NECTEC's BEST corpus
-(consists of 4 sections, article, news, novel and encyclopedia) and test on the rest 10%.
+The Convolutional Neural network is trained from 90 % of NECTEC's BEST corpus
+(consists of 4 sections, article, news, novel and encyclopedia) and test on the rest 10 %.
 It is a binary classification model trying to predict whether a character is the beginning of word or not.
 The results calculated from only 'true' class are as follow
 
@@ -52,7 +53,10 @@ Make sure you are using `tensorflow` backend in `Keras` by making sure `~/.keras
 }
 ```
 
-We do not add `tensorflow` in automatic installation process because it has cpu and gpu version. Installing cpu version to everyone might break those who already have gpu version installed. So please install tensorflow yourself following this guildline https://www.tensorflow.org/install/.
+We do not add `tensorflow` in automatic installation process because it has cpu and gpu version.
+Installing cpu version to everyone might break those who already have gpu version installed.
+So please install `tensorflow` yourself following this guildline https://www.tensorflow.org/install/.
+
 
 ### Docker
 
@@ -129,12 +133,14 @@ Some texts might not be segmented as we would expected (e.g. 'โรงเรี
 
 Any suggestion and comment are welcome, please post it in issue section.
 
+
 ## Contributors
 
 * [Rakpong Kittinaradorn](https://github.com/rkcosmos)
 * [Korakot Chaovavanich](https://github.com/korakot)
 * [Titipat Achakulvisut](https://github.com/titipata)
 * [Chanwit Kaewkasi](https://github.com/chanwit)
+
 
 ## Partner Organizations
 
