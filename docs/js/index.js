@@ -6,6 +6,13 @@ const model = new KerasJS.Model({
 model.ready()
     .then(() => {
         $('#loading').hide();
+
+        // predict from GET parameter 
+        var text = new URL(window.location.href).searchParams.get("text");
+        if (text != null) {
+            $('#message').val(text).trigger('keyup');
+            $('label[for="message"]').addClass('active')
+        }
     })
     .catch(err => {
         console.log(err);
