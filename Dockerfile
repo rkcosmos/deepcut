@@ -36,8 +36,6 @@ RUN pip install https://pypi.python.org/packages/7d/d0/96269b9ecfcc55cb387798315
 
 RUN pip install deepcut
 
-COPY keras.json /root/.keras/
-
 WORKDIR /root
 
 ENTRYPOINT /bin/sh
