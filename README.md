@@ -4,6 +4,8 @@
 
 A Thai word tokenization library using Deep Neural Network.
 
+![](https://user-images.githubusercontent.com/1214890/58486992-14c1d880-8191-11e9-9122-8385750e06bd.png)
+
 ## What's new?
 
 * Deepcut JS, try tokenizing Thai text on browser [here](https://rkcosmos.github.io/deepcut/)
