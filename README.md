@@ -103,8 +103,11 @@ Here is an example usage:
 from deepcut import DeepcutTokenizer
 tokenizer = DeepcutTokenizer(ngram_range=(1,1),
                              max_df=1.0, min_df=0.0)
-X = tokenizer.fit_tranform(['ฉันบินได้', 'ฉันกินข้าว', 'ฉันอยากบิน']) # 3 x 4 CSR sparse matrix
-print(tokenizer.vocabulary_) # {'กิน': 0, 'ข้าว': 3, 'อยาก': 1, 'ได้': 2}
+X = tokenizer.fit_tranform(['ฉันบินได้', 'ฉันกินข้าว', 'ฉันอยากบิน']) # 3 x 6 CSR sparse matrix
+print(tokenizer.vocabulary_) # {'บิน': 0, 'ได้': 1, 'ฉัน': 2, 'อยาก': 3, 'ข้าว': 4, 'กิน': 5}
+
+X_test = tokenizer.transform(['ฉันกิน', 'ฉันไม่อยากบิน']) # use built tokenizer to transform new text
+print(X_test.shape)
 ```
 
 

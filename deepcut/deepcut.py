@@ -139,6 +139,8 @@ class DeepcutTokenizer(object):
         self.dtype = dtype
         self.max_df = max_df
         self.min_df = min_df
+        if max_df < 0 or min_df < 0:
+            raise ValueError("negative value for max_df or min_df")
         self.max_features = max_features
         self.stop_words = _check_stop_list(stop_words)
 
@@ -190,13 +192,13 @@ class DeepcutTokenizer(object):
 
         # Calculate a mask based on document frequencies
         dfs = _document_frequency(X)
-        tfs = np.asarray(X.sum(axis=0)).ravel()
         mask = np.ones(len(dfs), dtype=bool)
         if high is not None:
             mask &= dfs <= high
         if low is not None:
             mask &= dfs >= low
         if limit is not None and mask.sum() > limit:
+            tfs = np.asarray(X.sum(axis=0)).ravel()
             mask_inds = (-tfs[mask]).argsort()[:limit]
             new_mask = np.zeros(len(dfs), dtype=bool)
             new_mask[np.where(mask)[0][mask_inds]] = True
@@ -214,10 +216,15 @@ class DeepcutTokenizer(object):
         if len(kept_indices) == 0:
             raise ValueError("After pruning, no terms remain. Try a lower"
                              " min_df or a higher max_df.")
-        return X[:, kept_indices], vocabulary, removed_terms
+        return X[:, kept_indices], removed_terms
 
 
     def transform(self, raw_documents, new_document=False):
+        """
+        raw_documents: list, list of new documents to be transformed
+        new_document: bool, if True, assume seeing documents and build a new self.vobabulary_,
+            if False, use the previous self.vocabulary_
+        """
         n_doc = len(raw_documents)
         tokenized_documents = []
         for doc in raw_documents:
@@ -250,22 +257,22 @@ class DeepcutTokenizer(object):
                           dtype=self.dtype)
 
         # truncate vocabulary by max_df and min_df
-        max_df = self.max_df
-        min_df = self.min_df
-        max_doc_count = (max_df
-                         if isinstance(max_df, numbers.Integral)
-                         else max_df * n_doc)
-        min_doc_count = (min_df
-                         if isinstance(min_df, numbers.Integral)
-                         else min_df * n_doc)
-        if max_doc_count < min_doc_count:
-            raise ValueError(
-                "max_df corresponds to < documents than min_df")
-        X, vocabulary, _ = self._limit_features(X, self.vocabulary_,
-                                                max_doc_count,
-                                                min_doc_count,
-                                                self.max_features)
-        self.vocabulary_ = vocabulary
+        if new_document:
+            max_df = self.max_df
+            min_df = self.min_df
+            max_doc_count = (max_df
+                            if isinstance(max_df, numbers.Integral)
+                            else max_df * n_doc)
+            min_doc_count = (min_df
+                            if isinstance(min_df, numbers.Integral)
+                            else min_df * n_doc)
+            if max_doc_count < min_doc_count:
+                raise ValueError(
+                    "max_df corresponds to < documents than min_df")
+            X, _ = self._limit_features(X, self.vocabulary_,
+                                        max_doc_count,
+                                        min_doc_count,
+                                        self.max_features)
 
         return X
 
@@ -280,7 +287,6 @@ class DeepcutTokenizer(object):
 
     def tokenize(self, text, custom_dict=None):
         n_pad = 21
-        n_pad_2 = int((n_pad - 1)/2)
 
         if not text:
             return [''] # case of empty string
