@@ -1,8 +1,6 @@
 # Deepcut
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/rkcosmos/deepcut/blob/master/LICENSE)
-
-[![DOI](https://zenodo.org/badge/95091660.svg)](https://zenodo.org/badge/latestdoi/95091660)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/rkcosmos/deepcut/blob/master/LICENSE) [![DOI](https://zenodo.org/badge/95091660.svg)](https://zenodo.org/badge/latestdoi/95091660)
 
 A Thai word tokenization library using Deep Neural Network.
 
@@ -148,6 +146,17 @@ Any suggestion and comment are welcome, please post it in issue section.
 * [Titipat Achakulvisut](https://github.com/titipata)
 * [Chanwit Kaewkasi](https://github.com/chanwit)
 
+
+## Citations
+
+If you want to reference `deepcut` in your publication, please cite as follows
+
+```
+Rakpong Kittinaradorn, Titipat Achakulvisut, Korakot Chaovavanich, Kittinan Srithaworn, 
+Pattarawat Chormai, Chanwit Kaewkasi, Tulakan Ruangrong, Krichkorn Oparad. 
+(2019, September 23). DeepCut: A Thai word tokenization library using 
+Deep Neural Network. Zenodo. http://doi.org/10.5281/zenodo.3457707
+```
 
 ## Partner Organizations
 
