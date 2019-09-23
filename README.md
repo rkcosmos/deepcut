@@ -95,19 +95,18 @@ Output will be in list format
 
 #### Bag-of-word transformation
 
-We implemented tokenizer which works similar to
-[`CountVectorizer`](http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html) from `scikit-learn`.
-Here is an example usage:
+We implemented a tokenizer which works similar to
+[`CountVectorizer`](http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html) from `scikit-learn`. Here is an example usage:
 
 ```python
 from deepcut import DeepcutTokenizer
 tokenizer = DeepcutTokenizer(ngram_range=(1,1),
                              max_df=1.0, min_df=0.0)
 X = tokenizer.fit_tranform(['ฉันบินได้', 'ฉันกินข้าว', 'ฉันอยากบิน']) # 3 x 6 CSR sparse matrix
-print(tokenizer.vocabulary_) # {'บิน': 0, 'ได้': 1, 'ฉัน': 2, 'อยาก': 3, 'ข้าว': 4, 'กิน': 5}
+print(tokenizer.vocabulary_) # {'บิน': 0, 'ได้': 1, 'ฉัน': 2, 'อยาก': 3, 'ข้าว': 4, 'กิน': 5}, column index of sparse matrix
 
-X_test = tokenizer.transform(['ฉันกิน', 'ฉันไม่อยากบิน']) # use built tokenizer to transform new text
-print(X_test.shape)
+X_test = tokenizer.transform(['ฉันกิน', 'ฉันไม่อยากบิน']) # use built tokenizer vobalurary to transform new text
+print(X_test.shape) # 2 x 6 CSR sparse matrix
 ```
 
 
@@ -149,13 +148,28 @@ Any suggestion and comment are welcome, please post it in issue section.
 
 ## Citations
 
-If you want to reference `deepcut` in your publication, please cite as follows
+If you use `deepcut` in your project or publication, please cite the library as follows
 
 ```
 Rakpong Kittinaradorn, Titipat Achakulvisut, Korakot Chaovavanich, Kittinan Srithaworn, 
 Pattarawat Chormai, Chanwit Kaewkasi, Tulakan Ruangrong, Krichkorn Oparad. 
 (2019, September 23). DeepCut: A Thai word tokenization library using 
 Deep Neural Network. Zenodo. http://doi.org/10.5281/zenodo.3457707
+```
+
+or BibTeX entry:
+
+```
+@misc{Kittinaradorn2019,
+    author       = {Rakpong Kittinaradorn, Titipat Achakulvisut, Korakot Chaovavanich, Kittinan Srithaworn, Pattarawat Chormai, Chanwit Kaewkasi, Tulakan Ruangrong, Krichkorn Oparad},
+    title        = {{DeepCut: A Thai word tokenization library using Deep Neural Network}},
+    month        = Sep,
+    year         = 2019,
+    doi          = {10.5281/zenodo.3457707},
+    version      = {1.0},
+    publisher    = {Zenodo},
+    url          = {http://doi.org/10.5281/zenodo.3457707}
+}
 ```
 
 ## Partner Organizations
