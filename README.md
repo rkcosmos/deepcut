@@ -2,6 +2,8 @@
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/rkcosmos/deepcut/blob/master/LICENSE)
 
+[![DOI](https://zenodo.org/badge/95091660.svg)](https://zenodo.org/badge/latestdoi/95091660)
+
 A Thai word tokenization library using Deep Neural Network.
 
 ![](https://user-images.githubusercontent.com/1214890/58486992-14c1d880-8191-11e9-9122-8385750e06bd.png)
