@@ -27,7 +27,7 @@ def generate_words(files):
     repls = {'<NE>' : '','</NE>' : '','<AB>': '','</AB>': ''}
 
     words_all = []
-    for i, file in enumerate(files):
+    for _, file in enumerate(files):
         lines = open(file, 'r')
         for line in lines:
             line = reduce(lambda a, kv: a.replace(*kv), repls.items(), line)
@@ -160,7 +160,7 @@ def train_model(best_processed_path, weight_path='../weight/model_weight.h5', ve
     """
 
     x_train_char, x_train_type, y_train = prepare_feature(best_processed_path, option='train')
-    x_test_char, x_test_type, y_test = prepare_feature(best_processed_path, option='test')
+    # x_test_char, x_test_type, y_test = prepare_feature(best_processed_path, option='test')
 
     validation_set = False
     if os.path.isdir(os.path.join(best_processed_path, 'val')):

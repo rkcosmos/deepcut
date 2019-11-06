@@ -18,7 +18,7 @@ Then run the script below.
 python true_intent_classification.py
 ```
 
-Below is the classification score of `action` on 15 percent leave out training set
+Below is the prediction score on `action` column on 15 percent leave out training set
 
 | Method                         | Accuracy | Precision | Recall |   F1   |
 | ------------------------------ | -------- | --------- | ------ | ------ |
@@ -31,7 +31,7 @@ Below is the classification score of `action` on 15 percent leave out training s
 | Bigram + TDIDF + Logistic Reg  | 76.30    | 86.15     | 76.92  | 81.27  |
 | Bigram + TFIDF + Linear SVC    | **82.95** | **88.85** | **84.54** | **86.64**  |
 
-And classification score for `destination` on 15 percent leave out training set
+And prediction score on `destination` column on 15 percent leave out training set
 
 | Method                         | Accuracy | Precision | Recall |   F1   |
 | ------------------------------ | -------- | --------- | ------ | ------ |
@@ -43,3 +43,7 @@ And classification score for `destination` on 15 percent leave out training set
 | Bigram + Linear SVC            | 76.56    | 82.78     | 82.23  | 82.50  |
 | Bigram + TDIDF + Logistic Reg  | 65.48    | 93.53     | 65.53  | 77.07  |
 | Bigram + TFIDF + Linear SVC    | 78.21    | 89.84     | 79.75  | 84.50  |
+
+## License
+
+Please refer to the license from the repository for each corpus before usage.
