@@ -9,6 +9,7 @@ from itertools import chain
 import numpy as np
 import scipy.sparse as sp
 import six
+import pickle
 
 from .model import get_convo_nn2
 from .stop_words import THAI_STOP_WORDS
@@ -88,6 +89,20 @@ def _check_stop_list(stop):
         return None
     # assume it's a collection
     return frozenset(stop)
+
+
+def load_model(file_path):
+    """
+    Load saved pickle file of DeepcutTokenizer
+
+    Parameters
+    ==========
+    file_path: str, path to saved model from ``save_model`` method in DeepcutTokenizer 
+    """
+    tokenizer = pickle.load(open(file_path, 'rb'))
+    tokenizer.model = get_convo_nn2()
+    tokenizer.model = tokenizer.model.load_weights(WEIGHT_PATH)
+    return tokenizer
 
 
 class DeepcutTokenizer(object):
@@ -325,3 +340,11 @@ class DeepcutTokenizer(object):
                 tokens.append(word)
                 word = ''
         return tokens
+
+    def save_model(self, file_path):
+        """
+        Save tokenizer to pickle format
+        """
+        self.model = None # set model to None to successfully save the model
+        with open(file_path, 'wb') as f:
+            pickle.dump(self, f)

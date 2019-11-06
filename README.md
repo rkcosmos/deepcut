@@ -86,6 +86,16 @@ print(tokenizer.vocabulary_) # {'บิน': 0, 'ได้': 1, 'ฉัน': 2, 
 
 X_test = tokenizer.transform(['ฉันกิน', 'ฉันไม่อยากบิน']) # use built tokenizer vobalurary to transform new text
 print(X_test.shape) # 2 x 6 CSR sparse matrix
+
+tokenizer.save_model('tokenizer.pickle') # save the tokenizer to use later
+```
+
+You can load the saved tokenizer to use later
+
+``` python
+tokenizer = deepcut.load_model('tokenizer.pickle')
+X_sample = tokenizer.transform(['ฉันกิน', 'ฉันไม่อยากบิน'])
+print(X_sample.shape) # getting the same 2 x 6 CSR sparse matrix as X_test
 ```
 
 ### Custom Dictionary
