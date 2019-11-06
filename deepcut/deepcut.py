@@ -9,7 +9,6 @@ from itertools import chain
 import numpy as np
 import scipy.sparse as sp
 import six
-from keras import backend
 
 from .model import get_convo_nn2
 from .stop_words import THAI_STOP_WORDS
@@ -132,7 +131,6 @@ class DeepcutTokenizer(object):
                  max_df=1.0, min_df=1, max_features=None, dtype=np.dtype('float64')):
         self.model = get_convo_nn2()
         self.model.load_weights(WEIGHT_PATH)
-        self.graph = backend.get_session().graph # save graph for reference in async
 
         self.vocabulary_ = {}
         self.ngram_range = ngram_range
@@ -298,10 +296,10 @@ class DeepcutTokenizer(object):
         word_end = []
         # Fix thread-related issue in Keras + TensorFlow + Flask async environment
         # ref: https://github.com/keras-team/keras/issues/2397
-        with self.graph.as_default():
-            y_predict = self.model.predict([x_char, x_type])
-            y_predict = (y_predict.ravel() > 0.5).astype(int)
-            word_end = y_predict[1:].tolist() + [1]
+        
+        y_predict = self.model.predict([x_char, x_type])
+        y_predict = (y_predict.ravel() > 0.5).astype(int)
+        word_end = y_predict[1:].tolist() + [1]
 
         if custom_dict is not None:
             if isinstance(custom_dict, list):
