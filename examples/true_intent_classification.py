@@ -58,7 +58,6 @@ if __name__ == '__main__':
 
     print('"Prediction result on bigram count vectorizer matrix"')
     X_train, X_val, y_train, y_val = train_test_split(X_bigram, y, test_size=0.15, random_state=1412)
-    predictors = [(LinearSVC(max_iter=3000), 'linear_svc'), (LogisticRegression(solver='lbfgs'), 'logistic_regression')]
     for predictor, predictor_name in predictors:
         pred_model = OneVsRestClassifier(predictor)
         pred_model.fit(X_train, y_train)
@@ -69,7 +68,6 @@ if __name__ == '__main__':
 
     print('\n\n')
     print('"Prediction result on tf-idf of bigram bag of words matrix"')
-    X_train, X_val, y_train, y_val = train_test_split(X_bigram, y, test_size=0.15, random_state=1412)
     tfidf_transformer = TfidfTransformer()
     X_train_tfidf = tfidf_transformer.fit_transform(X_train)
     X_val_tfidf = tfidf_transformer.transform(X_val)
