@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # encoding: utf-8
-from keras.models import Model
-from keras.layers import Input, Dense, Embedding, \
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input, Dense, Embedding, \
     Concatenate, Flatten, SpatialDropout1D, \
     BatchNormalization, Conv1D, Maximum, ZeroPadding1D
-from keras.layers import TimeDistributed
-from keras.optimizers import Adam
+from tensorflow.keras.layers import TimeDistributed
+from tensorflow.keras.optimizers import Adam
 
 def conv_unit(inp, n_gram, no_word=200, window=2):
     out = Conv1D(no_word, window, strides=1, padding="valid", activation='relu')(inp)

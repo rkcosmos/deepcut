@@ -9,6 +9,7 @@ A Thai word tokenization library using Deep Neural Network.
 ## What's new?
 
 * `examples` folder provide starter script for classification problem
+* `v0.7` Migrate from keras to tensorflow 2.0
 * Deepcut JS, try tokenizing Thai text on browser [here](https://rkcosmos.github.io/deepcut/)
 * `v0.6` Add stop words, updated weight with semi-supervised learning, custom dictionary
 * `v0.5.2` Better weight matrix
