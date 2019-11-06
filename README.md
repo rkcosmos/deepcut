@@ -4,62 +4,40 @@
 
 A Thai word tokenization library using Deep Neural Network.
 
-![](https://user-images.githubusercontent.com/1214890/58486992-14c1d880-8191-11e9-9122-8385750e06bd.png)
+![model_structure](https://user-images.githubusercontent.com/1214890/58486992-14c1d880-8191-11e9-9122-8385750e06bd.png)
 
-## What's new?
+## What's new
 
-* `examples` folder provide starter script for classification problem
-* `v0.7` Migrate from keras to tensorflow 2.0
-* Deepcut JS, try tokenizing Thai text on browser [here](https://rkcosmos.github.io/deepcut/)
-* `v0.6` Add stop words, updated weight with semi-supervised learning, custom dictionary
-* `v0.5.2` Better weight matrix
-* `v0.5.1` Faster tokenization by code refactorization from our new contributor: Titipat Achakulvisut
+* `v0.7.0` Migrate from keras to TensorFlow 2.0
+* `v0.6.0` Allow excluding stop words and custom dictionary, updated weight with semi-supervised learning
+* `v0.5.2` Better pretrained weight matrix
+* `v0.5.1` Faster tokenization by code refactorization
+* `examples` folder provide starter script for Thai text classification problem
+* `DeepcutJS`, you can try tokenizing Thai text on web browser [here](https://rkcosmos.github.io/deepcut/)
 
 ## Performance
 
-The Convolutional Neural network is trained from 90 % of NECTEC's BEST corpus
-(consists of 4 sections, article, news, novel and encyclopedia) and test on the rest 10 %.
-It is a binary classification model trying to predict whether a character is the beginning of word or not.
-The results calculated from only 'true' class are as follow
+The Convolutional Neural network is trained from 90 % of NECTEC's BEST corpus (consists of 4 sections, article, news, novel and encyclopedia) and test on the rest 10 %. It is a binary classification model trying to predict whether a character is the beginning of word or not. The results calculated from only 'true' class are as follow
 
-* f1 score:  98.1%
-* precision score:  97.8%
-* recall score:  98.5%
+| Precision | Recall |   F1   |
+| --------- | ------ | ------ |
+| 97.8%     | 98.5%  | 98.1%  |
 
 ## Installation
 
-Install using `pip` for stable release, 
+Install using `pip` for stable release,
 
 ``` bash
 pip install deepcut
 ```
 
-For latest development release, 
+For latest development release (recommended),
 
 ``` bash
 pip install git+git://github.com/rkcosmos/deepcut.git
 ```
 
-Or clone the repository and install using `setup.py` 
-
-``` bash
-python setup.py install
-```
-
-Make sure you are using `tensorflow` backend in `Keras` by making sure `~/.keras/keras.json` is as follows (see also https://keras.io/backend/)
-
-``` bash
-{
-  "floatx": "float32",
-  "epsilon": 1e-07,
-  "backend": "tensorflow",
-  "image_data_format": "channels_last"
-}
-```
-
-We do not add `tensorflow` in automatic installation process because it has cpu and gpu version.
-Installing cpu version to everyone might break those who already have gpu version installed.
-So please install `tensorflow` yourself following this guildline https://www.tensorflow.org/install/.
+We do not add `tensorflow` in automatic installation process because it has cpu and gpu version. Installing cpu version to everyone might break those who already have gpu version installed. So please install `tensorflow` yourself following [this guildline](https://www.tensorflow.org/install/).
 
 ### Docker
 
@@ -72,7 +50,7 @@ curl -sSL https://get.docker.com | sudo sh
 docker build -t deepcut .
 ```
 
-For other OS: see https://docs.docker.com/engine/installation/
+For other OS: see [docker installation page](https://docs.docker.com/engine/installation/)
 
 To run this Docker image:
 
@@ -97,8 +75,7 @@ Output will be in list format
 
 ### Bag-of-word transformation
 
-We implemented a tokenizer which works similar to
-[ `CountVectorizer` ](http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html) from `scikit-learn` . Here is an example usage:
+We implemented a tokenizer which works similar to [`CountVectorizer`](http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html) from `scikit-learn` . Here is an example usage:
 
 ``` python
 from deepcut import DeepcutTokenizer
@@ -150,8 +127,7 @@ If you use `deepcut` in your project or publication, please cite the library as 
 ``` bash
 Rakpong Kittinaradorn, Titipat Achakulvisut, Korakot Chaovavanich, Kittinan Srithaworn,
 Pattarawat Chormai, Chanwit Kaewkasi, Tulakan Ruangrong, Krichkorn Oparad.
-(2019, September 23). DeepCut: A Thai word tokenization library using 
-Deep Neural Network. Zenodo. http://doi.org/10.5281/zenodo.3457707
+(2019, September 23). DeepCut: A Thai word tokenization library using Deep Neural Network. Zenodo. http://doi.org/10.5281/zenodo.3457707
 ```
 
 or BibTeX entry:
@@ -174,4 +150,3 @@ or BibTeX entry:
 * True Corporation
 
 And we are open for contribution and collaboration.
-
