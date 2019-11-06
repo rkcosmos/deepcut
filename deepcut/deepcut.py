@@ -133,6 +133,7 @@ class DeepcutTokenizer(object):
         self.model = get_convo_nn2()
         self.model.load_weights(WEIGHT_PATH)
         self.graph = backend.get_session().graph # save graph for reference in async
+        self.sess = backend.get_session()
 
         self.vocabulary_ = {}
         self.ngram_range = ngram_range
@@ -299,6 +300,7 @@ class DeepcutTokenizer(object):
         # Fix thread-related issue in Keras + TensorFlow + Flask async environment
         # ref: https://github.com/keras-team/keras/issues/2397
         with self.graph.as_default():
+            backend.set_session(self.sess)
             y_predict = self.model.predict([x_char, x_type])
             y_predict = (y_predict.ravel() > 0.5).astype(int)
             word_end = y_predict[1:].tolist() + [1]
