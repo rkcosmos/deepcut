@@ -8,6 +8,7 @@ A Thai word tokenization library using Deep Neural Network.
 
 ## What's new?
 
+* `examples` folder provide starter script for classification problem
 * Deepcut JS, try tokenizing Thai text on browser [here](https://rkcosmos.github.io/deepcut/)
 * `v0.6` Add stop words, updated weight with semi-supervised learning, custom dictionary
 * `v0.5.2` Better weight matrix
@@ -26,27 +27,27 @@ The results calculated from only 'true' class are as follow
 
 ## Installation
 
-Install using `pip` for stable release,
+Install using `pip` for stable release, 
 
-```bash
+``` bash
 pip install deepcut
 ```
 
-For latest development release,
+For latest development release, 
 
-```bash
+``` bash
 pip install git+git://github.com/rkcosmos/deepcut.git
 ```
 
-Or clone the repository and install using `setup.py`
+Or clone the repository and install using `setup.py` 
 
-```bash
+``` bash
 python setup.py install
 ```
 
 Make sure you are using `tensorflow` backend in `Keras` by making sure `~/.keras/keras.json` is as follows (see also https://keras.io/backend/)
 
-```bash
+``` bash
 {
   "floatx": "float32",
   "epsilon": 1e-07,
@@ -59,13 +60,13 @@ We do not add `tensorflow` in automatic installation process because it has cpu 
 Installing cpu version to everyone might break those who already have gpu version installed.
 So please install `tensorflow` yourself following this guildline https://www.tensorflow.org/install/.
 
-
 ### Docker
 
 Install Docker on your machine
 
 For Linux:
-```bash
+
+``` bash
 curl -sSL https://get.docker.com | sudo sh
 docker build -t deepcut .
 ```
@@ -74,7 +75,7 @@ For other OS: see https://docs.docker.com/engine/installation/
 
 To run this Docker image:
 
-```bash
+``` bash
 docker run --rm -it deepcut
 ```
 
@@ -82,23 +83,23 @@ It will open a shell for us to play with deepcut.
 
 ## Usage
 
-```python
+``` python
 import deepcut
 deepcut.tokenize('ตัดคำได้ดีมาก')
 ```
 
 Output will be in list format
 
-```bash
+``` bash
 ['ตัดคำ','ได้','ดี','มาก']
 ```
 
-#### Bag-of-word transformation
+### Bag-of-word transformation
 
 We implemented a tokenizer which works similar to
-[`CountVectorizer`](http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html) from `scikit-learn`. Here is an example usage:
+[ `CountVectorizer` ](http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html) from `scikit-learn` . Here is an example usage:
 
-```python
+``` python
 from deepcut import DeepcutTokenizer
 tokenizer = DeepcutTokenizer(ngram_range=(1,1),
                              max_df=1.0, min_df=0.0)
@@ -109,34 +110,30 @@ X_test = tokenizer.transform(['ฉันกิน', 'ฉันไม่อยา
 print(X_test.shape) # 2 x 6 CSR sparse matrix
 ```
 
-
-#### Custom Dictionary
+### Custom Dictionary
 
 User can add custom dictionary by adding path to `.txt` file with one word per line like the following.
 
-```bash
+``` bash
 ขี้เกียจ
 โรงเรียน
 ```
 
 The file can be placed as an argument in `tokenize` function e.g.
 
-```python
+``` python
 deepcut.tokenize('ตัดคำได้ดีมาก', custom_dict='/path/to/custom_dict.txt')
 deepcut.tokenize('ตัดคำได้ดีมาก', custom_dict=['ดีมาก']) # alternatively, you can provide a list of custom dictionary
 ```
 
-
 ## Notes
 
-Some texts might not be segmented as we would expected (e.g. 'โรงเรียน' -> ['โรง', 'เรียน']), this is because of
+Some texts might not be segmented as we would expected (e.g.'โรงเรียน' -> ['โรง', 'เรียน']), this is because of
 
 * BEST corpus (training data) tokenizes word this way (They use 'Compound words' as a criteria for segmentation)
-
 * They are unseen/new words -> Ideally, this would be cured by having better corpus but it's not very practical so I am thinking of doing semi-supervised learning to incorporate new examples.
 
 Any suggestion and comment are welcome, please post it in issue section.
-
 
 ## Contributors
 
@@ -145,21 +142,20 @@ Any suggestion and comment are welcome, please post it in issue section.
 * [Titipat Achakulvisut](https://github.com/titipata)
 * [Chanwit Kaewkasi](https://github.com/chanwit)
 
-
 ## Citations
 
 If you use `deepcut` in your project or publication, please cite the library as follows
 
-```
-Rakpong Kittinaradorn, Titipat Achakulvisut, Korakot Chaovavanich, Kittinan Srithaworn, 
-Pattarawat Chormai, Chanwit Kaewkasi, Tulakan Ruangrong, Krichkorn Oparad. 
+``` bash
+Rakpong Kittinaradorn, Titipat Achakulvisut, Korakot Chaovavanich, Kittinan Srithaworn,
+Pattarawat Chormai, Chanwit Kaewkasi, Tulakan Ruangrong, Krichkorn Oparad.
 (2019, September 23). DeepCut: A Thai word tokenization library using 
 Deep Neural Network. Zenodo. http://doi.org/10.5281/zenodo.3457707
 ```
 
 or BibTeX entry:
 
-```
+``` bib
 @misc{Kittinaradorn2019,
     author       = {Rakpong Kittinaradorn, Titipat Achakulvisut, Korakot Chaovavanich, Kittinan Srithaworn, Pattarawat Chormai, Chanwit Kaewkasi, Tulakan Ruangrong, Krichkorn Oparad},
     title        = {{DeepCut: A Thai word tokenization library using Deep Neural Network}},
@@ -177,3 +173,4 @@ or BibTeX entry:
 * True Corporation
 
 And we are open for contribution and collaboration.
+
