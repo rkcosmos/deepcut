@@ -41,24 +41,14 @@ We do not add `tensorflow` in automatic installation process because it has cpu 
 
 ### Docker
 
-Install Docker on your machine
-
-For Linux:
+First, install and run [`docker`](https://www.docker.com/get-started) on your machine. Then, you can build and run `deepcut` as follows
 
 ``` bash
-curl -sSL https://get.docker.com | sudo sh
-docker build -t deepcut .
+docker build -t deepcut:dev . # build docker image
+docker run --rm -it deepcut:dev # run docker, -it flag makes it interactive, --rm for clean up the container and remove file system
 ```
 
-For other OS: see [docker installation page](https://docs.docker.com/engine/installation/)
-
-To run this Docker image:
-
-``` bash
-docker run --rm -it deepcut
-```
-
-It will open a shell for us to play with deepcut.
+This will open a shell for us to play with `deepcut`.
 
 ## Usage
 
@@ -105,9 +95,10 @@ User can add custom dictionary by adding path to `.txt` file with one word per l
 ``` bash
 ขี้เกียจ
 โรงเรียน
+ดีมาก
 ```
 
-The file can be placed as an argument in `tokenize` function e.g.
+The file can be placed as an `custom_dict` argument in `tokenize` function e.g.
 
 ``` python
 deepcut.tokenize('ตัดคำได้ดีมาก', custom_dict='/path/to/custom_dict.txt')
@@ -159,4 +150,4 @@ or BibTeX entry:
 
 * True Corporation
 
-And we are open for contribution and collaboration.
+We are open for contribution and collaboration.
