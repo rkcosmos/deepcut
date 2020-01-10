@@ -25,7 +25,7 @@ The Convolutional Neural network is trained from 90 % of NECTEC's BEST corpus (c
 
 ## Installation
 
-Install using `pip` for stable release,
+Install using `pip` for stable release (tensorflow version2.0),
 
 ``` bash
 pip install deepcut
@@ -37,7 +37,11 @@ For latest development release (recommended),
 pip install git+git://github.com/rkcosmos/deepcut.git
 ```
 
-We do not add `tensorflow` in automatic installation process because it has cpu and gpu version. Installing cpu version to everyone might break those who already have gpu version installed. So please install `tensorflow` yourself following [this guildline](https://www.tensorflow.org/install/).
+If you want to use tensorflow version 1.x and standalone keras, you will need
+
+``` bash
+pip install deepcut==0.6.1
+```
 
 ### Docker
 
