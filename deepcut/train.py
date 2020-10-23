@@ -135,9 +135,9 @@ def prepare_feature(best_processed_path, option='train'):
     type_row = ['type' + str(i + 1) for i in range(n_pad_2)] + \
                ['type-' + str(i + 1) for i in range(n_pad_2)] + ['type']
 
-    x_char = df_pad[char_row].as_matrix()
-    x_type = df_pad[type_row].as_matrix()
-    y = df_pad['target'].astype(int).as_matrix()
+    x_char = df_pad[char_row].to_numpy()
+    x_type = df_pad[type_row].to_numpy()
+    y = df_pad['target'].astype(int).to_numpy()
 
     return x_char, x_type, y
 
